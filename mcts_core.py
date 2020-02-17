@@ -42,10 +42,6 @@ class MctsEnv(object):
   def step(self, states, action):
     pass
 
-  @abc.abstractmethod
-  def reset(self):
-    pass
-
 
 # TODO: documentation
 class MctsCore(object):
@@ -72,8 +68,8 @@ class MctsCore(object):
     value_score = child.value()
     return prior_score + value_score
 
-  def initialize(self):
-    self.root = Node(self._env.reset())
+  def initialize(self, states):
+    self.root = Node(states)
     assert self.root.states is not None
     self.expand_node(self.root)
     assert self.root.expanded(), (
@@ -99,10 +95,12 @@ class MctsCore(object):
     return node, search_path, last_action
 
   def select_child(self, node):
-    _, action, child = max(
-        (self._ucb_score_fn(node, child), action, child)
-        for action, child in node.children.items())
+    _, action, child = max(self.get_ucb_distribution(node))
     return action, child
+
+  def get_ucb_distribution(self, node):
+    return [(self._ucb_score_fn(node, child), action, child)
+            for action, child in node.children.items()]
 
   def expand_node(self, node):
     if node.expanded():
@@ -115,7 +113,7 @@ class MctsCore(object):
         self._env.step(parent_state, last_action))
     for action in node.children.keys():
       node.children[action].prior = policy_dict[action]
-    node.state = states
+    node.states = states
     node.reward = reward
     node.is_final = is_final
     return predicted_value
