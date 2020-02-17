@@ -46,7 +46,7 @@ class MctsEnv(object):
 # TODO: documentation
 class MctsCore(object):
 
-    def __init__(self, num_simulations, env, ucb_score_fn=None):
+    def __init__(self, env, ucb_score_fn=None):
         if ucb_score_fn is not None:
             self._ucb_score_fn = ucb_score_fn
         else:
