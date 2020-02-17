@@ -2,16 +2,21 @@
 import abc
 import math
 
+# TODO: documentation
+# TODO: set up auto lint
+# TODO: set up auto test on github
+# TODO: set up code review on github
 
 class Node(object):
 
-  def __init__(self, prior=1.):
+  def __init__(self, states=None, prior=1.):
     self.visit_count = 0
     self.prior = prior
     self.value_sum = 0
     self.children = {}
-    self.states = None
+    self.states = states
     self.reward = 0
+    self.is_final = False
 
   def expanded(self):
     return len(self.children) > 0
@@ -20,6 +25,10 @@ class Node(object):
     if self.visit_count == 0:
       return 0
     return self.value_sum / self.visit_count
+
+  def __repr__(self):
+    return "{{v: {}, p: {}, v_sum: {}, s: {}, r: {}, c: {}}}".format(
+        self.visit_count, self.prior, self.value_sum, self.states, self.reward, self.children)
 
 
 class MctsEnv(object):
@@ -33,7 +42,12 @@ class MctsEnv(object):
   def step(self, states, action):
     pass
 
+  @abc.abstractmethod
+  def reset(self):
+    pass
 
+
+# TODO: documentation
 class MctsCore(object):
 
   def __init__(self, num_simulations, env, ucb_score_fn=None):
@@ -50,7 +64,7 @@ class MctsCore(object):
     self._action_history = []
 
   def _ucb_score(self, parent, child):
-    pc_c = math.log((parent.visit_count + self._pb_c_base + 1) /
+    pb_c = math.log((parent.visit_count + self._pb_c_base + 1) /
                     self._pb_c_base) + self._pb_c_init
     pb_c *= math.sqrt(parent.visit_count) / (child.visit_count + 1)
 
@@ -58,14 +72,18 @@ class MctsCore(object):
     value_score = child.value()
     return prior_score + value_score
 
-  def initialize(self, root_states):
-    self.root = Node(root_states)
+  def initialize(self):
+    self.root = Node(self._env.reset())
+    assert self.root.states is not None
     self.expand_node(self.root)
+    assert self.root.expanded(), (
+      'You should be able to take an action from the root.')
 
   def rollout(self):
     node, search_path, last_action = self.select_node(self.root)
     self.expand_node(node)
     parent = search_path[-2]
+    assert parent.states is not None
     value = self.evaluate_node(node, parent.states, last_action)
     self.backpropagate(search_path, value)
 
@@ -85,7 +103,7 @@ class MctsCore(object):
         (self._ucb_score_fn(node, child), action, child)
         for action, child in node.children.items())
     return action, child
-    
+
   def expand_node(self, node):
     if node.expanded():
       return
@@ -93,12 +111,13 @@ class MctsCore(object):
       node.children[action] = Node()
 
   def evaluate_node(self, node, parent_state, last_action):
-    state, reward, policy_dict, predicted_value = (
-        self.env.step(parent_state, last_action))
+    states, is_final, reward, policy_dict, predicted_value = (
+        self._env.step(parent_state, last_action))
     for action in node.children.keys():
       node.children[action].prior = policy_dict[action]
-    node.state = state
+    node.state = states
     node.reward = reward
+    node.is_final = is_final
     return predicted_value
 
   def backpropagate(self, search_path, value):
@@ -107,3 +126,9 @@ class MctsCore(object):
       node.visit_count += 1
       value = node.reward + self._env.discount * value
 
+  def get_policy_distribution(self):
+    # TODO: return distribution of visit counts
+    pass
+
+  def get_root_for_testing(self):
+    return self.root
