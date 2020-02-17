@@ -47,7 +47,6 @@ class MctsEnv(object):
 class MctsCore(object):
 
   def __init__(self, num_simulations, env, ucb_score_fn=None):
-    self._num_simulations = num_simulations
     if ucb_score_fn is not None:
       self._ucb_score_fn = ucb_score_fn
     else:
@@ -69,22 +68,22 @@ class MctsCore(object):
     return prior_score + value_score
 
   def initialize(self, states):
-    self.root = Node(states)
-    assert self.root.states is not None
-    self.expand_node(self.root)
-    assert self.root.expanded(), (
+    self._root = Node(states)
+    assert self._root.states is not None
+    self.expand_node(self._root)
+    assert self._root.expanded(), (
       'You should be able to take an action from the root.')
 
   def rollout(self):
-    node, search_path, last_action = self.select_node(self.root)
+    node, search_path, last_action = self.select_node()
     self.expand_node(node)
     parent = search_path[-2]
     assert parent.states is not None
     value = self.evaluate_node(node, parent.states, last_action)
     self.backpropagate(search_path, value)
 
-  def select_node(self, root):
-    node = root
+  def select_node(self):
+    node = self._root
     search_path = [node]
 
     last_action = None
@@ -129,4 +128,4 @@ class MctsCore(object):
     pass
 
   def get_root_for_testing(self):
-    return self.root
+    return self._root

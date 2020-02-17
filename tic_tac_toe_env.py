@@ -15,6 +15,7 @@ class TicTacToeEnv(MctsEnv):
         return [0]*9
 
     def get_predicted_value(self):
+      # This is the 'simulation' step in the pure MCTS.
       # TODO: play randomly and get the reward.
       return 0.
 
