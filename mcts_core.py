@@ -1,8 +1,11 @@
 
+import abc
+import math
+
 
 class Node(object):
 
-  def __init__(self, prior: float = 0.):
+  def __init__(self, prior=1.):
     self.visit_count = 0
     self.prior = prior
     self.value_sum = 0
@@ -19,15 +22,27 @@ class Node(object):
     return self.value_sum / self.visit_count
 
 
+class MctsEnv(object):
+  __metaclass__ = abc.ABCMeta
+  
+  def __init__(self, discount, action_space):
+    self.discount = discount
+    self.action_space = action_space
+
+  @abc.abstractmethod
+  def step(self, states, action):
+    pass
+
+
 class MctsCore(object):
 
-  def __init__(self, num_simulations=100, ucb_score_fn=None, discount: float = 0.99):
+  def __init__(self, num_simulations, env, ucb_score_fn=None):
     self._num_simulations = num_simulations
     if ucb_score_fn is not None:
       self._ucb_score_fn = ucb_score_fn
     else:
-      self._ucb_score_fn = self.ucb_score
-    self._discount = discount
+      self._ucb_score_fn = self._ucb_score
+    self._env = env
 
     self._pb_c_base = 19652
     self._pb_c_init = 1.25
@@ -35,7 +50,7 @@ class MctsCore(object):
     self._action_history = []
 
   def _ucb_score(self, parent, child):
-    pc_b = math.log((parent.visit_count + self._pb_c_base + 1) /
+    pc_c = math.log((parent.visit_count + self._pb_c_base + 1) /
                     self._pb_c_base) + self._pb_c_init
     pb_c *= math.sqrt(parent.visit_count) / (child.visit_count + 1)
 
@@ -43,6 +58,52 @@ class MctsCore(object):
     value_score = child.value()
     return prior_score + value_score
 
-  def _action(self, time_step):
-    pass
+  def initialize(self, root_states):
+    self.root = Node(root_states)
+    self.expand_node(self.root)
+
+  def rollout(self):
+    node, search_path, last_action = self.select_node(self.root)
+    self.expand_node(node)
+    parent = search_path[-2]
+    value = self.evaluate_node(node, parent.states, last_action)
+    self.backpropagate(search_path, value)
+
+  def select_node(self, root):
+    node = root
+    search_path = [node]
+
+    last_action = None
+    while node.expanded():
+      action, node = self.select_child(node)
+      last_action = action
+      search_path.append(node)
+    return node, search_path, last_action
+
+  def select_child(self, node):
+    _, action, child = max(
+        (self._ucb_score_fn(node, child), action, child)
+        for action, child in node.children.items())
+    return action, child
+    
+  def expand_node(self, node):
+    if node.expanded():
+      return
+    for action in self._env.action_space:
+      node.children[action] = Node()
+
+  def evaluate_node(self, node, parent_state, last_action):
+    state, reward, policy_dict, predicted_value = (
+        self.env.step(parent_state, last_action))
+    for action in node.children.keys():
+      node.children[action].prior = policy_dict[action]
+    node.state = state
+    node.reward = reward
+    return predicted_value
+
+  def backpropagate(self, search_path, value):
+    for node in search_path:
+      node.value_sum += value
+      node.visit_count += 1
+      value = node.reward + self._env.discount * value
 
