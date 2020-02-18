@@ -1,11 +1,11 @@
 
-import abc
 import math
 
 # TODO: documentation
 # TODO: set up auto lint
 # TODO: set up auto test on github
 # TODO: set up code review on github
+
 
 class Node(object):
 
@@ -29,18 +29,6 @@ class Node(object):
     def __repr__(self):
         return "{{v: {}, p: {}, v_sum: {}, s: {}, r: {}, c: {}}}".format(
                 self.visit_count, self.prior, self.value_sum, self.states, self.reward, self.children)
-
-
-class MctsEnv(object):
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, discount, action_space):
-        self.discount = discount
-        self.action_space = action_space
-
-    @abc.abstractmethod
-    def step(self, states, action):
-        pass
 
 
 # TODO: documentation

@@ -31,8 +31,7 @@ class TicTacToeEnvTest(unittest.TestCase):
         self.assertEquals((False, 0.0), self.env.check(states))
         self.assertEquals(1, self.env.opponent_play(states))
 
-        # [4, 4, 4, 0, 1, 0, 1, 1, 0]
-        self.assertEquals(0., self.env.get_predicted_value(states))
+        self.assertEquals(-1., self.env.get_predicted_value(states))
 
 if __name__ == '__main__':
     unittest.main()
