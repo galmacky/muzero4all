@@ -2,6 +2,7 @@
 import unittest
 
 from mcts_core import MctsCore
+from mcts_env_dynamics_model import MctsEnvDynamicsModel
 from tic_tac_toe_env import TicTacToeEnv
 
 
@@ -9,7 +10,8 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = TicTacToeEnv()
-        self.core = MctsCore(env=self.env)
+        self.dynamics_model = MctsEnvDynamicsModel(self.env)
+        self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model)
 
     def test_game(self):
         self.core.initialize([0] * 9)

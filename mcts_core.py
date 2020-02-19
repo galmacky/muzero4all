@@ -34,12 +34,14 @@ class Node(object):
 # TODO: documentation
 class MctsCore(object):
 
-    def __init__(self, env, ucb_score_fn=None):
+    def __init__(self, env, dynamics_model, discount=1., ucb_score_fn=None):
+        self._env = env
+        self.dynamics_model = dynamics_model
+        self.discount = discount
         if ucb_score_fn is not None:
             self._ucb_score_fn = ucb_score_fn
         else:
             self._ucb_score_fn = self._ucb_score
-        self._env = env
 
         self._pb_c_base = 19652
         self._pb_c_init = 1.25
@@ -96,8 +98,8 @@ class MctsCore(object):
             node.children[action] = Node()
 
     def evaluate_node(self, node, parent_state, last_action):
-        states, is_final, reward, policy_dict, predicted_value = (
-                self._env.step(parent_state, last_action))
+        states, is_final, reward, policy_dict, predicted_value = self.dynamics_model.step(
+                parent_state, last_action)
         for action in node.children.keys():
             node.children[action].prior = policy_dict[action]
         node.states = states
@@ -109,7 +111,7 @@ class MctsCore(object):
         for node in search_path:
             node.value_sum += value
             node.visit_count += 1
-            value = node.reward + self._env.discount * value
+            value = node.reward + self.discount * value
 
     def get_policy_distribution(self):
         # TODO: return distribution of visit counts

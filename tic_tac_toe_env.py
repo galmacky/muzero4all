@@ -5,7 +5,6 @@ import numpy as np
 from mcts_env import MctsEnv
 
 
-# TODO: split this into TicTacToeEnv and MctsEnvDynamicsModel
 class TicTacToeEnv(MctsEnv):
 
     def __init__(self, r_seed=0):
@@ -20,25 +19,6 @@ class TicTacToeEnv(MctsEnv):
     def legal_actions(self, states):
         return [i for i, state in enumerate(states) if state == 0]
 
-    def get_predicted_value(self, states):
-        # This is the 'simulation' step in the pure MCTS.
-        # TODO: need to check the final states in test for extra clarity.
-        states = copy.deepcopy(states)
-        while True:
-            legal_actions = self.legal_actions(states)
-            np.random.seed(self.r_seed)
-            self.r_seed += 1
-            action = np.random.choice(a=legal_actions)
-            states[action] = 1
-            is_final, reward = self.check(states)
-            if is_final:
-                return reward
-            opponent_action = self.opponent_play(states)
-            states[opponent_action] = 4
-            is_final, reward = self.check(states)
-            if is_final:
-                return reward
-
     def opponent_play(self, states):
         for i, state in enumerate(states):
             if state == 0:
@@ -50,13 +30,13 @@ class TicTacToeEnv(MctsEnv):
         new_states = copy.deepcopy(states)
         # TODO: check if we want to consider legal actions only.
         if new_states[action] != 0:
-            return new_states, False, -1., self.default_policy_prior, -1.
+            return new_states, True, -1.
 
         new_states[action] = 1
 
         is_final, reward = self.check(new_states)
         if is_final:
-            return new_states, is_final, reward, self.default_policy_prior, reward
+            return new_states, is_final, reward
 
         # TODO(P3): make this smarter (and still reproducible).
         # Opponent places X at the first available space.
@@ -64,12 +44,7 @@ class TicTacToeEnv(MctsEnv):
         new_states[opponent_action] = 4
 
         is_final, reward = self.check(new_states)
-        if is_final:
-            predicted_value = reward
-        else:
-            predicted_value = self.get_predicted_value(new_states)
-
-        return new_states, is_final, reward, self.default_policy_prior, predicted_value
+        return new_states, is_final, reward
 
     def check(self, states):
         sums = [sum((states[0], states[1], states[2])), sum((states[3], states[4], states[5])),
