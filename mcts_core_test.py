@@ -71,6 +71,11 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
         # TODO: verify that the numbers are correct.
         self.assertEqual([1.25] * 8 + [-0.375], self.get_ucb_distribution(root))
 
+        # We visited only action 8. The result is somewhat counter-intuitive so
+        # far, but the policy is 100% on action 8.
+        self.assertEqual({action: 1.0 if action == 8 else 0.0 for action in range(0, 9)},
+                         self.core.get_policy_distribution())
+
 
 if __name__ == '__main__':
     unittest.main()

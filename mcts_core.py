@@ -115,8 +115,18 @@ class MctsCore(object):
             value = node.reward + self.discount * value
 
     def get_policy_distribution(self):
-        # TODO: return distribution of visit counts
-        pass
+        """
+            Returns:
+                A dict of {action: the ratio of top-level visit counts}.
+        """
+        policy = {}
+        sum = 0
+        for _, child in self._root.children.items():
+            sum += child.visit_count
+        assert sum == self._root.visit_count
+        for action, child in self._root.children.items():
+            policy[action] = float(child.visit_count) / self._root.visit_count
+        return policy
 
     def get_root_for_testing(self):
         return self._root

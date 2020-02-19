@@ -11,7 +11,7 @@ class MctsEnvDynamicsModelTest(unittest.TestCase):
         self.env = TicTacToeEnv()
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
 
-    def test_get_predicted_value(self):
+    def test_get_predicted_value_and_final_info(self):
         # Check some conditions first.
         states = [0] * 9
         states[4] = 1
