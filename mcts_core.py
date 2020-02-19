@@ -57,7 +57,8 @@ class MctsCore(object):
         value_score = child.value()
         return prior_score + value_score
 
-    def initialize(self, states):
+    def initialize(self):
+        states = self.dynamics_model.get_initial_states()
         self._root = Node(states)
         assert self._root.states is not None
         self.expand_node(self._root)

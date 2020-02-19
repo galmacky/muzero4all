@@ -9,29 +9,28 @@ class TicTacToeEnvTest(unittest.TestCase):
         self.env = TicTacToeEnv()
 
     def test_check(self):
-        self.assertEquals((False, 0.0), self.env.check([0] * 8 + [1]))
+        self.assertEqual((False, 0.), self.env.check([0] * 8 + [1]))
+        self.assertEqual((True, -1.), self.env.check([4, 4, 4, 0, 1, 1, 0, 0, 0]))
+        self.assertEqual((True, 1.), self.env.check([4, 4, 0, 1, 1, 1, 0, 0, 0]))
 
     def test_legal_actions(self):
         states = [0] * 9
         states[3] = 1
         states[7] = 4
         states[8] = 1
-        self.assertEquals([0, 1, 2, 4, 5, 6], self.env.legal_actions(states))
+        self.assertEqual([0, 1, 2, 4, 5, 6], self.env.legal_actions(states))
 
     def test_opponent_play(self):
         # Chooses the first available space.
-        self.assertEquals(0, self.env.opponent_play([0] * 8 + [1]))
-        self.assertEquals(8, self.env.opponent_play([1] * 8 + [0]))
+        self.assertEqual(0, self.env.opponent_play([0] * 8 + [1]))
+        self.assertEqual(8, self.env.opponent_play([1] * 8 + [0]))
 
-    def test_get_predicted_value(self):
-        # Check some conditions first.
-        states = [0] * 9
-        states[4] = 1
-        states[0] = 4
-        self.assertEquals((False, 0.0), self.env.check(states))
-        self.assertEquals(1, self.env.opponent_play(states))
+    def test_step(self):
+        states, is_final, reward = self.env.step([4, 4, 0, 0, 1, 1, 0, 0, 0], 3)
+        self.assertEqual([4, 4, 0, 1, 1, 1, 0, 0, 0], states)
+        self.assertTrue(is_final)
+        self.assertEqual(1., reward)
 
-        self.assertEquals(-1., self.env.get_predicted_value(states))
 
 if __name__ == '__main__':
     unittest.main()

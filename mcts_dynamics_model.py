@@ -1,7 +1,6 @@
 
 import abc
-import copy
-import numpy as np
+
 
 class MctsDynamicsModel(object):
     """This is a plug-in architecture for MCTS core. TODO: the name is somewhat misleading. Rename this."""
@@ -9,6 +8,10 @@ class MctsDynamicsModel(object):
 
     @abc.abstractmethod
     def get_initial_states(self):
+        pass
+
+    @abc.abstractmethod
+    def reset(self):
         pass
 
     @abc.abstractmethod

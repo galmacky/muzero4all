@@ -12,22 +12,27 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
         # This is a multiplier in UCB algorithm. 1.0 means no prior.
         self.default_policy_prior = {k: 1. for k in env.action_space}
         self.env = env
+        # TODO: check if we need to discount more
         self.discount = discount
         self.max_depth = max_depth
+        self.r_seed_init = r_seed
         self.r_seed = r_seed
 
     def get_initial_states(self):
         return self.env.reset()
+
+    def reset(self):
+        self.r_seed = self.r_seed_init
 
     def step(self, states, action):
         new_states, is_final, reward = self.env.step(states, action)
         if is_final:
             predicted_value = reward
         else:
-            predicted_value = self.get_predicted_value(new_states)
+            predicted_value, _ = self.get_predicted_value_and_final_info(new_states)
         return new_states, is_final, reward, self.default_policy_prior, predicted_value
 
-    def get_predicted_value(self, starting_states):
+    def get_predicted_value_and_final_info(self, starting_states):
         depth = 0
         states = copy.deepcopy(starting_states)
         # This is the 'simulation' step in the pure MCTS.
@@ -45,4 +50,4 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
 
             if is_final or depth >= self.max_depth:
                 # TODO: need to check the final states in test for extra clarity.
-                return returns
+                return returns, (states, action)

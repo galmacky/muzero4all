@@ -14,11 +14,11 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
         self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model)
 
     def test_game(self):
-        self.core.initialize([0] * 9)
+        self.core.initialize()
         # TODO: run tic-tac-toe game 100 times and check winning ratios.
 
     def test_rollout(self):
-        self.core.initialize([0] * 9)
+        self.core.initialize()
         # TODO: test more succinctly.
         self.assertEqual('{v: 0, p: 1.0, v_sum: 0, s: [0, 0, 0, 0, 0, 0, 0, 0, 0], r: 0, c: {0: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 1: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 2: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 3: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 4: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 5: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 6: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 7: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}, 8: {v: 0, p: 1.0, v_sum: 0, s: None, r: 0, c: {}}}}',
                          str(self.core.get_root_for_testing()))
@@ -38,7 +38,7 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
         return [ucb for _, ucb in l3]
 
     def test_inside_initial_rollouts(self):
-        self.core.initialize([0] * 9)
+        self.core.initialize()
         root = self.core.get_root_for_testing()
 
         self.assertEqual([0.] * 9, self.get_ucb_distribution(root))
