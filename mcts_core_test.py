@@ -1,4 +1,5 @@
 
+import numpy as np
 import unittest
 
 from mcts_core import MctsCore
@@ -12,10 +13,6 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
         self.env = TicTacToeEnv()
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
         self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model)
-
-    def test_game(self):
-        self.core.initialize()
-        # TODO: run tic-tac-toe game 100 times and check winning ratios.
 
     def test_rollout(self):
         self.core.initialize()
@@ -73,8 +70,8 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
 
         # We visited only action 8. The result is somewhat counter-intuitive so
         # far, but the policy is 100% on action 8.
-        self.assertEqual({action: 1.0 if action == 8 else 0.0 for action in range(0, 9)},
-                         self.core.get_policy_distribution())
+        np.testing.assert_array_equal([0.] * 8 + [1.],
+                                      self.core.get_policy_distribution())
 
 
 if __name__ == '__main__':

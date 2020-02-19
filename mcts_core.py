@@ -1,5 +1,6 @@
 
 import math
+import numpy as np
 
 # TODO: documentation
 # TODO: set up auto lint
@@ -119,13 +120,19 @@ class MctsCore(object):
             Returns:
                 A dict of {action: the ratio of top-level visit counts}.
         """
-        policy = {}
+        # TODO: remove this once we have proper test.
         sum = 0
         for _, child in self._root.children.items():
             sum += child.visit_count
         assert sum == self._root.visit_count
-        for action, child in self._root.children.items():
-            policy[action] = float(child.visit_count) / self._root.visit_count
+
+        # TODO: use tf instead.
+        # Note that action_space is a range. This is basically 'size' of the range.
+        policy = np.zeros((self._env.action_space[-1] + 1))
+        for action in self._env.action_space:
+            if action in self._root.children:
+                policy[action] = float(self._root.children[action].visit_count) / self._root.visit_count
+
         return policy
 
     def get_root_for_testing(self):

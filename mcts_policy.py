@@ -1,20 +1,39 @@
 
+import numpy as np
+import tensorflow as tf
+
 from mcts_core import MctsCore
+from policy import Policy
 
 
-class MctsPolicy(object):
+class MctsPolicy(Policy):
 
-    def __init__(self, env, dynamics_model, num_simulations=100):
-        self.core = MctsCore(env)
+    def __init__(self, env, dynamics_model, num_simulations=100, r_seed=0):
+        self.core = MctsCore(env, dynamics_model)
         self.env = env
         self.dynamics_model = dynamics_model
         self.num_simulations = num_simulations
+        self.r_seed_init = r_seed
+        self.r_seed = r_seed
 
     def reset(self):
         self.dynamics_model.reset()
+        # We may need to reset env as well.
+        self.r_seed = self.r_seed_init
 
-    def action(self):
+    def get_policy_logits(self):
         self.core.initialize()
         for _ in range(self.num_simulations):
             self.core.rollout()
-        policy_logits = self.core.get_policy_distribution()
+        policy_logits = tf.convert_to_tensor(self.core.get_policy_distribution())
+        policy_logits = tf.expand_dims(policy_logits, 0)  # batch_size=1
+        return policy_logits
+
+    def sample_action(self, policy_logits):
+        tf.random.set_seed(self.r_seed)
+        self.r_seed += 1
+        sampled_action = tf.squeeze(tf.random.categorical(logits=policy_logits, num_samples=1))
+        return sampled_action
+
+    def action(self):
+        return self.sample_action(self.get_policy_logits())
