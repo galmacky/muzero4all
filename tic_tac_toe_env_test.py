@@ -26,7 +26,8 @@ class TicTacToeEnvTest(unittest.TestCase):
         self.assertEqual(8, self.env.opponent_play([1] * 8 + [0]))
 
     def test_step(self):
-        states, is_final, reward = self.env.step([4, 4, 0, 0, 1, 1, 0, 0, 0], 3)
+        self.env.set_states([4, 4, 0, 0, 1, 1, 0, 0, 0])
+        states, is_final, reward = self.env.step(3)
         self.assertEqual([4, 4, 0, 1, 1, 1, 0, 0, 0], states)
         self.assertTrue(is_final)
         self.assertEqual(1., reward)

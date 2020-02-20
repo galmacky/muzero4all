@@ -29,11 +29,11 @@ class MctsPolicy(Policy):
         policy_logits = tf.expand_dims(policy_logits, 0)  # batch_size=1
         return policy_logits
 
-    def sample_action(self, policy_logits):
+    def sample_action(self, logits):
         tf.random.set_seed(self.r_seed)
         self.r_seed += 1
-        sampled_action = tf.squeeze(tf.random.categorical(logits=policy_logits, num_samples=1))
-        return sampled_action
+        return tf.squeeze(tf.random.categorical(logits=logits, num_samples=1))
 
     def action(self):
-        return self.sample_action(self.get_policy_logits())
+        sampled_action = self.sample_action(self.get_policy_logits())
+        return sampled_action, self.env.step(sampled_action)

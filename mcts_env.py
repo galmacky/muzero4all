@@ -5,15 +5,17 @@ import abc
 class MctsEnv(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, discount, action_space):
-        self.discount = discount
+    def __init__(self, action_space):
         self.action_space = action_space
 
     @abc.abstractmethod
-    def step(self, states, action):
+    def reset(self):
         pass
 
-    def legal_actions(self):
-        return self.action_space
+    @abc.abstractmethod
+    def set_states(self):
+        pass
 
-
+    @abc.abstractmethod
+    def step(self, action):
+        pass

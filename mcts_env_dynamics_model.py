@@ -25,7 +25,8 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
         self.r_seed = self.r_seed_init
 
     def step(self, states, action):
-        new_states, is_final, reward = self.env.step(states, action)
+        self.env.set_states(states)
+        new_states, is_final, reward = self.env.step(action)
         if is_final:
             predicted_value = reward
         else:
@@ -43,11 +44,12 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
             self.r_seed += 1
             action = np.random.choice(a=self.env.action_space)
 
-            states, is_final, reward = self.env.step(states, action)
+            self.env.set_states(states)
+            states, is_final, reward = self.env.step(action)
             returns += acc_discount * reward
             acc_discount *= self.discount
             depth += 1
 
             if is_final or depth >= self.max_depth:
-                # TODO: need to check the final states in test for extra clarity.
+                self.env.set_states(starting_states)
                 return returns, (states, action)

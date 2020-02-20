@@ -7,12 +7,14 @@ from mcts_env import MctsEnv
 class TicTacToeEnv(MctsEnv):
 
     def __init__(self):
-        super(TicTacToeEnv, self).__init__(discount=1., action_space=range(0, 9))
+        super(TicTacToeEnv, self).__init__(action_space=range(0, 9))
         # This is a multiplier in UCB algorithm. 1.0 means no prior.
         self.default_policy_prior = {k: 1. for k in range(9)}
+        self._states = [0] * 9
 
     def reset(self):
-        return [0] * 9
+        self._states = [0] * 9
+        return self._states
 
     def legal_actions(self, states):
         return [i for i, state in enumerate(states) if state == 0]
@@ -23,26 +25,30 @@ class TicTacToeEnv(MctsEnv):
                 return i
         assert False, 'There is no empty space for opponent to play at.'
 
-    def step(self, states, action):
-        assert states is not None
-        new_states = copy.deepcopy(states)
+    def set_states(self, states):
+        self._states = states
+
+    def get_states(self):
+        return self._states
+
+    def step(self, action):
         # TODO: check if we want to consider legal actions only.
-        if new_states[action] != 0:
-            return new_states, True, -1.
+        if self._states[action] != 0:
+            return self._states, True, -1.
 
-        new_states[action] = 1
+        self._states[action] = 1
 
-        is_final, reward = self.check(new_states)
+        is_final, reward = self.check(self._states)
         if is_final:
-            return new_states, is_final, reward
+            return self._states, is_final, reward
 
         # TODO(P3): make this smarter (and still reproducible).
         # Opponent places X at the first available space.
-        opponent_action = self.opponent_play(new_states)
-        new_states[opponent_action] = 4
+        opponent_action = self.opponent_play(self._states)
+        self._states[opponent_action] = 4
 
-        is_final, reward = self.check(new_states)
-        return new_states, is_final, reward
+        is_final, reward = self.check(self._states)
+        return self._states, is_final, reward
 
     def check(self, states):
         sums = [sum((states[0], states[1], states[2])), sum((states[3], states[4], states[5])),
