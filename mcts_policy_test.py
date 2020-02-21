@@ -16,6 +16,8 @@ class MctsPolicyTest(unittest.TestCase):
     def test_action(self):
         action, unused_env_step = self.policy.action()
         self.assertEqual(3, action)
+        print (unused_env_step)
+        self.assertEqual(([4, 0, 0, 1, 0, 0, 0, 0, 0], False, 0.0), unused_env_step)
 
     def test_policy_logits(self):
         logits = self.policy.get_policy_logits()
@@ -23,7 +25,6 @@ class MctsPolicyTest(unittest.TestCase):
 
     def test_game(self):
         while True:
-            print (self.env.get_states())
             action, unused_env_step = self.policy.action()
             print (action, unused_env_step)
             states, is_final, reward = unused_env_step
