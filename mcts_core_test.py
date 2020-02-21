@@ -66,7 +66,8 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
 
         # Action of 8 yielded a reward of 0. The action has been discounted.
         # TODO: verify that the numbers are correct.
-        self.assertEqual([1.25] * 8 + [-0.375], self.get_ucb_distribution(root))
+        np.testing.assert_almost_equal([1.2501018] * 8 + [-0.3749491],
+                                       self.get_ucb_distribution(root))
 
         # We visited only action 8. The result is somewhat counter-intuitive so
         # far, but the policy is 100% on action 8.
