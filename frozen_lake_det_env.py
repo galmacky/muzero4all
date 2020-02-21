@@ -1,6 +1,5 @@
 
 import copy
-import gym
 
 from mcts_env import MctsEnv
 

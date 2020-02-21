@@ -18,7 +18,7 @@ class MctsEnv(object):
 
     @abc.abstractmethod
     def step(self, action):
-    	"""Returns (states, is_final, reward). 
-    	Note: states will eventually get called bet into set_states()
-    	"""
+        """Returns (states, is_final, reward). 
+        Note: states will eventually get called back into set_states()
+        """
         pass
