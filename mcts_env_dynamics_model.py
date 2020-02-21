@@ -19,18 +19,20 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
         self.r_seed = r_seed
 
     def get_initial_states(self):
-        return self.env.reset()
+        return self.env.get_states()
 
     def reset(self):
         self.r_seed = self.r_seed_init
 
     def step(self, states, action):
+        old_states = copy.deepcopy(self.env.get_states())
         self.env.set_states(states)
         new_states, is_final, reward = self.env.step(action)
         if is_final:
             predicted_value = reward
         else:
             predicted_value, _ = self.get_predicted_value_and_final_info(new_states)
+        self.env.set_states(old_states)
         return new_states, is_final, reward, self.default_policy_prior, predicted_value
 
     def get_predicted_value_and_final_info(self, starting_states):

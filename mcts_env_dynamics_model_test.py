@@ -25,4 +25,9 @@ class MctsEnvDynamicsModelTest(unittest.TestCase):
         self.assertEqual([4, 4, 0, 0, 1, 1, 0, 0, 0], final_info[0])  # states
         self.assertEqual(5, final_info[1])  # action
 
+    def test_step(self):
+        self.dynamics_model.step([0] * 9, 0)
+        # The above is a simulation step, so it should not affect the real environment.
+        self.assertEqual([0] * 9, self.env.get_states())
+
     # TODO: add a test for discount != 1.0
