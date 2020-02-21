@@ -1,23 +1,19 @@
 import abc
 
+from env import Env
 
-class MctsEnv(object):
+class MctsEnv(Env):
+    """This is an environment for Mcts Environment.
+    """
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, action_space):
-        self.action_space = action_space
+        super(MctsEnv, self).__init__(action_space)
 
     @abc.abstractmethod
-    def reset(self):
+    def get_states(self):
         pass
 
     @abc.abstractmethod
     def set_states(self, states):
-        pass
-
-    @abc.abstractmethod
-    def step(self, action):
-        """Returns (states, is_final, reward).
-        Note: states will eventually get called bet into set_states()
-        """
         pass

@@ -36,6 +36,9 @@ class FrozenLakeEnv(MctsEnv):
     def reset(self):
         self.env.reset()
 
+    def get_states(self):
+        return self._states
+
     # Set a state by going through all of the actions in states, starting
     # from the beginning.
     def set_states(self, states):
