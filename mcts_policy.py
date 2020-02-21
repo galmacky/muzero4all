@@ -26,13 +26,19 @@ class MctsPolicy(Policy):
         for _ in range(self.num_simulations):
             self.core.rollout()
         policy_logits = tf.convert_to_tensor(self.core.get_policy_distribution())
-        policy_logits = tf.expand_dims(policy_logits, 0)  # batch_size=1
+        #policy_logits = tf.expand_dims(policy_logits, 0)  # batch_size=1
         return policy_logits
 
     def sample_action(self, logits):
-        tf.random.set_seed(self.r_seed)
-        self.r_seed += 1
-        return tf.squeeze(tf.random.categorical(logits=logits, num_samples=1))
+        #tf.random.set_seed(self.r_seed)
+        #action = tf.random.categorical(logits=tf.math.log(logits), num_samples=1, seed=self.r_seed)
+        #self.r_seed += 1
+        #action = tf.squeeze(action)
+        #action = np.random.choice(a=np.array(logits))
+        #return action
+        # TODO: break tie randomly.
+        action = tf.math.argmax(logits)
+        return action
 
     def action(self):
         sampled_action = self.sample_action(self.get_policy_logits())

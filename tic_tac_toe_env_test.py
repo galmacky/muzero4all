@@ -10,8 +10,18 @@ class TicTacToeEnvTest(unittest.TestCase):
 
     def test_check(self):
         self.assertEqual((False, 0.), self.env.check([0] * 8 + [1]))
-        self.assertEqual((True, -1.), self.env.check([4, 4, 4, 0, 1, 1, 0, 0, 0]))
-        self.assertEqual((True, 1.), self.env.check([4, 4, 0, 1, 1, 1, 0, 0, 0]))
+        self.assertEqual((True, -1.), self.env.check([4, 4, 4,
+                                                      0, 1, 1,
+                                                      0, 0, 0]))
+        self.assertEqual((True, 1.), self.env.check([4, 4, 0,
+                                                     1, 1, 1,
+                                                     0, 0, 0]))
+        self.assertEqual((False, 0.), self.env.check([4, 4, 1,
+                                                      1, 4, 1,
+                                                      1, 0, 0]))
+        self.assertEqual((True, 0.), self.env.check([4, 1, 4,
+                                                     1, 4, 1,
+                                                     1, 4, 1]))
 
     def test_legal_actions(self):
         states = [0] * 9

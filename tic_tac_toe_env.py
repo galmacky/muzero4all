@@ -55,11 +55,11 @@ class TicTacToeEnv(MctsEnv):
                 sum((states[6], states[7], states[8])),
                 sum((states[0], states[3], states[6])), sum((states[1], states[4], states[7])),
                 sum((states[2], states[5], states[8])),
-                sum((states[0], states[4], states[8])), sum((states[2], states[4], states[7]))]
+                sum((states[0], states[4], states[8])), sum((states[2], states[4], states[6]))]
         if 3 in sums:
             return True, 1. # win
         if 12 in sums:
             return True, -1. # loss
-        if 0 in sums:
+        if 0 in states:
             return False, 0. # not finished
         return True, 0. # draw
