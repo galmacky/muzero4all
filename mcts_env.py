@@ -11,9 +11,5 @@ class MctsEnv(Env):
         super(MctsEnv, self).__init__(action_space)
 
     @abc.abstractmethod
-    def get_states(self):
-        pass
-
-    @abc.abstractmethod
     def set_states(self, states):
         pass

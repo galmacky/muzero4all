@@ -13,6 +13,10 @@ class Env(object):
         pass
 
     @abc.abstractmethod
+    def get_states(self):
+        pass
+
+    @abc.abstractmethod
     def step(self, action):
         """Returns (states, is_final, reward).
         Note: states will eventually get called bet into set_states()
