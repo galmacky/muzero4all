@@ -13,7 +13,7 @@ class MctsEnv(object):
         pass
 
     @abc.abstractmethod
-    def set_states(self):
+    def set_states(self, states):
         pass
 
     @abc.abstractmethod
