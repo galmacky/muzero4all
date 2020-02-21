@@ -1,16 +1,20 @@
 
 import copy
+import numpy as np
 
 from mcts_env import MctsEnv
 
 
 class TicTacToeEnv(MctsEnv):
 
-    def __init__(self):
+    def __init__(self, r_seed=0, use_random=False):
         super(TicTacToeEnv, self).__init__(action_space=range(0, 9))
         # This is a multiplier in UCB algorithm. 1.0 means no prior.
         self.default_policy_prior = {k: 1. for k in range(9)}
         self._states = [0] * 9
+        self.r_seed_init = r_seed
+        self.r_seed = r_seed
+        self.use_random = use_random
 
     def reset(self):
         self._states = [0] * 9
@@ -20,10 +24,14 @@ class TicTacToeEnv(MctsEnv):
         return [i for i, state in enumerate(states) if state == 0]
 
     def opponent_play(self, states):
-        for i, state in enumerate(states):
-            if state == 0:
-                return i
-        assert False, 'There is no empty space for opponent to play at.'
+        actions = self.legal_actions(states)
+        assert actions, 'There is no empty space for opponent to play at.'
+        if self.use_random:
+            np.random.seed(self.r_seed)
+            self.r_seed += 1
+            return np.random.choice(actions)
+        else:
+            return actions[0]
 
     def set_states(self, states):
         self._states = states

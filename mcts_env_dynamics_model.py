@@ -19,14 +19,15 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
         self.r_seed = r_seed
 
     def get_initial_states(self):
-        return self.env.get_states()
+        return copy.deepcopy(self.env.get_states())
 
     def reset(self):
         self.r_seed = self.r_seed_init
+        self.env.reset()
 
     def step(self, states, action):
         old_states = copy.deepcopy(self.env.get_states())
-        self.env.set_states(states)
+        self.env.set_states(copy.deepcopy(states))
         new_states, is_final, reward = self.env.step(action)
         if is_final:
             predicted_value = reward
@@ -38,7 +39,7 @@ class MctsEnvDynamicsModel(MctsDynamicsModel):
     def get_predicted_value_and_final_info(self, starting_states):
         depth = 0
         states = copy.deepcopy(starting_states)
-        # This is the 'simulation' step in the pure MCTS.
+        # This is the 'simulation' step in the pure MCTS - random play.
         returns = 0.
         acc_discount = 1.
         while True:

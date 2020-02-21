@@ -35,6 +35,13 @@ class TicTacToeEnvTest(unittest.TestCase):
         self.assertEqual(0, self.env.opponent_play([0] * 8 + [1]))
         self.assertEqual(8, self.env.opponent_play([1] * 8 + [0]))
 
+    def test_opponent_play_random(self):
+        self.env = TicTacToeEnv(r_seed=0, use_random=True)
+        s = set()
+        for i in range(100):
+            s.add(self.env.opponent_play([0, 1, 4, 0, 0, 0, 0, 0, 0]))
+        self.assertEqual([0] + list(range(3, 9)), list(s))
+
     def test_step(self):
         self.env.set_states([4, 4, 0, 0, 1, 1, 0, 0, 0])
         states, is_final, reward = self.env.step(3)

@@ -27,6 +27,7 @@ class MctsPolicy(Policy):
             self.core.rollout()
         policy_logits = tf.convert_to_tensor(self.core.get_policy_distribution())
         #policy_logits = tf.expand_dims(policy_logits, 0)  # batch_size=1
+        #print (policy_logits)
         return policy_logits
 
     def sample_action(self, logits):
