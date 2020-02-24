@@ -4,12 +4,12 @@ import unittest
 
 from mcts_env_dynamics_model import MctsEnvDynamicsModel
 from mcts_policy import MctsPolicy
-from tic_tac_toe_env import TicTacToeEnv
+from frozen_lake_det_env import FrozenLakeEnv
 
-
-class MctsPolicyTest(unittest.TestCase):
+# TOOO(timkim): how do I get the test values I want to assert? +changwan@ for help???
+class FrozenLakeMctsPolicyTest(unittest.TestCase):
     def setUp(self):
-        self.env = TicTacToeEnv()
+        self.env = FrozenLakeEnv()
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
         self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100)
 
