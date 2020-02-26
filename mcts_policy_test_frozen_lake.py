@@ -13,13 +13,12 @@ from frozen_lake_det_env import FrozenLakeEnv
 class FrozenLakeMctsPolicyTest(unittest.TestCase):
     def setUp(self):
         self.env = FrozenLakeEnv()
-        print("@@@@@@@@@@@@@@@@@@@")
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
         self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100)
 
     def test_game_deterministic(self):
         while True:
-            #print (self.policy.get_policy_logits())
+            # print (self.policy.get_policy_logits())  # THIS WILL MAKE SLOWER!!!
             action, states_isfinal_reward = self.policy.action()
             print ('Playing game: ', action, states_isfinal_reward)
             states, is_final, reward = states_isfinal_reward
