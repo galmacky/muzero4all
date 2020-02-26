@@ -71,3 +71,6 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
                 if is_final:
                     break
             self.assertEqual(1.0, reward, 'Failed with r_seed: {}'.format(r_seed))
+
+if __name__ == '__main__':
+    unittest.main()
