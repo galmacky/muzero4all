@@ -23,4 +23,30 @@ actions = [
 fl_env.set_states(actions)
 env.render()
 
+print("Is Final good: ")
+fl_env.reset()
+actions = [
+	frozen_lake.RIGHT,
+	frozen_lake.RIGHT,
+	frozen_lake.DOWN,
+	frozen_lake.DOWN,
+	frozen_lake.DOWN,
+	frozen_lake.RIGHT,
+]
+
+for action in actions:
+	new_states, done, rew = fl_env.step(action)
+	print(new_states, done, rew)
+
+print("Is Final bad: ")
+fl_env.reset()
+actions = [
+	frozen_lake.RIGHT,
+	frozen_lake.DOWN,
+]
+
+for action in actions:
+	new_states, done, rew = fl_env.step(action)
+	print(new_states, done, rew)
+
 env.close()
