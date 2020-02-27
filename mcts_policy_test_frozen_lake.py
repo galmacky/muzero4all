@@ -13,34 +13,23 @@ from frozen_lake_det_env import FrozenLakeEnv
 class FrozenLakeMctsPolicyTest(unittest.TestCase):
     def setUp(self):
         self.env = FrozenLakeEnv()
-        print("@@@@@@@@@@@@@@@@@@@")
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
-        self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100)
+        self.policy = MctsPolicy(self.env, self.dynamics_model, 
+            num_simulations=1000)
 
     def test_game_deterministic(self):
         while True:
-            #print (self.policy.get_policy_logits())
+            print (self.policy.get_policy_logits())  # THIS WILL MAKE SLOWER!!!
+            action_history = []
             action, states_isfinal_reward = self.policy.action()
-            print ('Playing game: ', action, states_isfinal_reward)
+            action_history.append(action)
+            print ('Playing game: ', action)
+
             states, is_final, reward = states_isfinal_reward
             if is_final:
                 break
+            self.env.env.render()
         self.assertEqual(1.0, reward)
 
-    def test_game_random(self):
-        # TODO: this fails when r_seed=7. Fix this.
-        for r_seed in range(5):
-            self.env = TicTacToeEnv(use_random=True, r_seed=r_seed)
-            self.dynamics_model = MctsEnvDynamicsModel(self.env, r_seed=r_seed)
-            self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100,
-                                     r_seed=r_seed)
-            while True:
-                action, states_isfinal_reward = self.policy.action()
-                print ('Playing game: ', action, states_isfinal_reward)
-                states, is_final, reward = states_isfinal_reward
-                if is_final:
-                    break
-            self.assertEqual(1.0, reward, 'Failed with r_seed: {}'.format(r_seed))
-            
 if __name__ == '__main__':
     unittest.main()

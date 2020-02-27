@@ -1,3 +1,6 @@
+# Env for just pure MCTS (requires perfect simulator, thus
+# needs set_states).
+
 import abc
 
 from env import Env

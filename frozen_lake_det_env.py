@@ -42,6 +42,7 @@ class FrozenLakeEnv(MctsEnv):
 
 
     def reset(self):
+        self._states = []
         self.env.reset()
 
     def get_states(self):
@@ -53,12 +54,14 @@ class FrozenLakeEnv(MctsEnv):
         """states is a list of actions."""
         self._states = states
         self.reset()
+        # self.step() will append to self._states unneccessarily
         for action in states:
-            self.step(action)
+            self.env.step(int(action))
 
     # Take a step and append to the list of actions stored in self._states.
     def step(self, action):
         # ob is unused
+        action = int(action)
         ob, rew, done , _ = self.env.step(action)
 
         self._states.append(action)
