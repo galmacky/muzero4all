@@ -31,18 +31,18 @@ class FrozenLakeEnv(MctsEnv):
         # replaying all actions.
         self._states = []
 
+        # Aliased by constants in frozen lake (https://github.com/openai/gym/blob/master/gym/envs/toy_text/frozen_lake.py)
         # Number of actions (Frozen lake is discrete).
         nA = self.env.action_space.n
 
         # TODO(changwan): Does is this how you want aciton_space to be defined? 
         # just a list of ints?????????????????????
 
-        # This is a multiplier in UCB algorithm. 1.0 means no prior.
-        self.default_policy_prior = {k: 1. for k in range(nA)}
         super(FrozenLakeEnv, self).__init__(action_space=range(nA))
 
 
     def reset(self):
+        self._states = []
         self.env.reset()
 
     def get_states(self):
@@ -54,12 +54,14 @@ class FrozenLakeEnv(MctsEnv):
         """states is a list of actions."""
         self._states = states
         self.reset()
+        # self.step() will append to self._states unneccessarily
         for action in states:
-            self.step(action)
+            self.env.step(int(action))
 
     # Take a step and append to the list of actions stored in self._states.
     def step(self, action):
         # ob is unused
+        action = int(action)
         ob, rew, done , _ = self.env.step(action)
 
         self._states.append(action)

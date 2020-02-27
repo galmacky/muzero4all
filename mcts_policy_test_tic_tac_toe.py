@@ -1,4 +1,5 @@
 
+import collections
 import tensorflow as tf
 import unittest
 
@@ -57,17 +58,29 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
                 break
         self.assertEqual(1.0, reward)
 
+    def play_game_once(self, r_seed):
+        self.env = TicTacToeEnv(use_random=True, r_seed=r_seed)
+        self.dynamics_model = MctsEnvDynamicsModel(self.env, r_seed=r_seed)
+        self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100,
+                                 r_seed=r_seed)
+        # TODO: we lose r_seed=7. check if we need to fix this.
+        while True:
+            action, states_isfinal_reward = self.policy.action()
+            #print('Playing game: ', action, states_isfinal_reward)
+            states, is_final, reward = states_isfinal_reward
+            if is_final:
+                return states, is_final, reward
+
     def test_game_random(self):
-        # TODO: this fails when r_seed=7. Fix this.
-        for r_seed in range(5):
-            self.env = TicTacToeEnv(use_random=True, r_seed=r_seed)
-            self.dynamics_model = MctsEnvDynamicsModel(self.env, r_seed=r_seed)
-            self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100,
-                                     r_seed=r_seed)
-            while True:
-                action, states_isfinal_reward = self.policy.action()
-                print ('Playing game: ', action, states_isfinal_reward)
-                states, is_final, reward = states_isfinal_reward
-                if is_final:
-                    break
-            self.assertEqual(1.0, reward, 'Failed with r_seed: {}'.format(r_seed))
+        reward_dict = collections.defaultdict(int)
+        for r_seed in range(100):
+            _, _, reward = self.play_game_once(r_seed)
+            reward_dict[reward] += 1
+        print ('reward distribution: ', reward_dict)
+        # 85% winning ratio.
+        # TODO: check why there is no draw.
+        self.assertGreater(reward_dict[1.0], 80)
+
+
+if __name__ == '__main__':
+    unittest.main()
