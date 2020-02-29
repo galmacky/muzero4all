@@ -8,7 +8,7 @@ from mcts_policy import MctsPolicy
 from tic_tac_toe_env import TicTacToeEnv
 
 
-class TicTacToeMctsPolicyTest(unittest.TestCase):
+class MctsPolicyTicTacToeTest(unittest.TestCase):
     def setUp(self):
         self.env = TicTacToeEnv()
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
