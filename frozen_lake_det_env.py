@@ -1,6 +1,6 @@
 
-import copy
 import gym
+import re
 
 from mcts_env import MctsEnv
 
@@ -40,13 +40,23 @@ class FrozenLakeEnv(MctsEnv):
 
         super(FrozenLakeEnv, self).__init__(action_space=range(nA))
 
-
     def reset(self):
         self._states = []
         self.env.reset()
+        return self._states
 
     def get_states(self):
         return self._states
+
+    def get_real_states(self):
+        """Returns env's real states not the action history."""
+        return self.remove_ansi(self.env.render(mode='ansi').getvalue())
+
+    def remove_ansi(self, ansi_str):
+        ansi_escape_8bit = re.compile(
+            r'(?:\x1B[@-Z\\-_]|[\x80-\x9A\x9C-\x9F]|(?:\x1B\[|\x9B)[0-?]*[ -/]*[@-~])'
+        )
+        return ansi_escape_8bit.sub('', ansi_str)
 
     # Set a state by going through all of the actions in states, starting
     # from the beginning.

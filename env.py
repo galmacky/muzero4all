@@ -1,6 +1,7 @@
 
 import abc
 
+from typing import List
 
 class Env(object):
     """An environment for MuZero that also serves as base class for pure MCTS environment."""
@@ -11,7 +12,7 @@ class Env(object):
         self.action_space = action_space
 
     @abc.abstractmethod
-    def reset(self):
+    def reset(self) -> List:
         pass
 
     @abc.abstractmethod

@@ -20,9 +20,7 @@ class FrozenLakeMctsPolicyTest(unittest.TestCase):
     def test_game_deterministic(self):
         while True:
             print (self.policy.get_policy_logits())  # THIS WILL MAKE SLOWER!!!
-            action_history = []
             action, states_isfinal_reward = self.policy.action()
-            action_history.append(action)
             print ('Playing game: ', action)
 
             states, is_final, reward = states_isfinal_reward
@@ -30,6 +28,7 @@ class FrozenLakeMctsPolicyTest(unittest.TestCase):
                 break
             self.env.env.render()
         self.assertEqual(1.0, reward)
+
 
 if __name__ == '__main__':
     unittest.main()
