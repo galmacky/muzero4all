@@ -6,8 +6,8 @@ import abc
 from env import Env
 
 class MctsEnv(Env):
-    """This is an environment for Mcts Environment.
-    """
+    """This is an environment for pure Mcts Environment."""
+
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, action_space):

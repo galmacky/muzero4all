@@ -15,7 +15,7 @@ class FrozenLakeMctsPolicyTest(unittest.TestCase):
         self.env = FrozenLakeEnv()
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
         self.policy = MctsPolicy(self.env, self.dynamics_model, 
-            num_simulations=1000)
+            num_simulations=10)
 
     def test_game_deterministic(self):
         while True:

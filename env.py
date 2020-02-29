@@ -1,11 +1,10 @@
-# MuZero and Pure MCTS
-
-# TODO: MAKE UnImplemented Error if not implemented
 
 import abc
 
 
 class Env(object):
+    """An environment for MuZero that also serves as base class for pure MCTS environment."""
+
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, action_space):

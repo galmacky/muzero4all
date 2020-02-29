@@ -2,13 +2,13 @@
 import math
 import numpy as np
 
-# TODO: documentation
 # TODO: set up auto lint
 # TODO: set up auto test on github
 # TODO: set up code review on github
 
 
 class Node(object):
+    """A node for MCTS core."""
 
     def __init__(self, states=None, prior=1.):
         self.visit_count = 0
@@ -32,8 +32,8 @@ class Node(object):
                 self.visit_count, self.prior, self.value_sum, self.states, self.reward, self.children)
 
 
-# TODO: documentation
 class MctsCore(object):
+    """A core engine for MCTS."""
 
     def __init__(self, env, dynamics_model, discount=1., ucb_score_fn=None):
         self._env = env
