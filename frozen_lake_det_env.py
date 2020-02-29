@@ -6,7 +6,6 @@ from mcts_env import MctsEnv
 
 # coding: utf-8
 """Defines some frozen lake maps."""
-from gym.envs.toy_text import frozen_lake, discrete
 from gym.envs.registration import register
 
 register(
@@ -16,7 +15,7 @@ register(
             'is_slippery': False})
 
 # Deterministic Frozen Lake
-class FrozenLakeEnv(MctsEnv):
+class FrozenLakeDetEnv(MctsEnv):
 
     def __init__(self):
         # 4x4, deterministic due to is_slipper=False.
@@ -38,7 +37,7 @@ class FrozenLakeEnv(MctsEnv):
         # TODO(changwan): Does is this how you want aciton_space to be defined? 
         # just a list of ints?????????????????????
 
-        super(FrozenLakeEnv, self).__init__(action_space=range(nA))
+        super(FrozenLakeDetEnv, self).__init__(action_space=range(nA))
 
     def reset(self):
         self._states = []
@@ -62,17 +61,14 @@ class FrozenLakeEnv(MctsEnv):
     # from the beginning.
     def set_states(self, states):
         """states is a list of actions."""
-        self._states = states
         self.reset()
-        # self.step() will append to self._states unneccessarily
         for action in states:
-            self.env.step(int(action))
+            self.step(action)
 
     # Take a step and append to the list of actions stored in self._states.
     def step(self, action):
-        # ob is unused
         action = int(action)
-        ob, rew, done , _ = self.env.step(action)
+        _, rew, done , _ = self.env.step(action)
 
         self._states.append(action)
         new_states = self._states
