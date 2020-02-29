@@ -31,3 +31,7 @@ class MctsEnvDynamicsModelTest(unittest.TestCase):
         self.assertEqual([0] * 9, self.env.get_states())
 
     # TODO: add a test for discount != 1.0
+
+
+if __name__ == '__main__':
+    unittest.main()
