@@ -17,7 +17,6 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
     def get_real_states(self):
         """Returns env's real states not the action history."""
         return self.remove_ansi(self.env.env.render(mode='ansi').getvalue())
-        #    return rendered_textiowrapper.read()
 
     def remove_ansi(self, ansi_str):
         ansi_escape_8bit = re.compile(
@@ -52,6 +51,7 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         self.assertEqual(1.0, reward)
         self.assertEqual(actions + [frozen_lake.RIGHT], new_states)
         self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.get_real_states())
+        # self.env.env.render()
 
     def test_hole(self):
         actions = [
@@ -65,6 +65,7 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         self.assertEqual(0.0, reward)
         self.assertEqual(actions, new_states)
         self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.get_real_states())
+        # self.env.env.render()
 
 
 if __name__ == '__main__':
