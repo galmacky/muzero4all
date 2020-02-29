@@ -57,6 +57,7 @@ class MctsCore(object):
         prior_score = pb_c * child.prior
         value_score = child.value()
         return prior_score + value_score
+        # return child.value() + math.log(2) * math.sqrt(math.log(parent.visit_count + 1) / (child.visit_count + 1))
 
     def initialize(self):
         states = self.dynamics_model.get_initial_states()

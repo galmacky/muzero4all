@@ -9,8 +9,8 @@ from policy import Policy
 class MctsPolicy(Policy):
     """A policy for pure MCTS."""
 
-    def __init__(self, env, dynamics_model, num_simulations=100, r_seed=0):
-        self.core = MctsCore(env, dynamics_model)
+    def __init__(self, env, dynamics_model, num_simulations=100, discount=1., r_seed=0):
+        self.core = MctsCore(env, dynamics_model, discount=discount)
         self.env = env
         self.dynamics_model = dynamics_model
         self.num_simulations = num_simulations

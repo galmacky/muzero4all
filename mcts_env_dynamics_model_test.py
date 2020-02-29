@@ -11,6 +11,21 @@ class MctsEnvDynamicsModelTest(unittest.TestCase):
         self.env = TicTacToeEnv()
         self.dynamics_model = MctsEnvDynamicsModel(self.env)
 
+    def test_get_predicted_value_and_final_info_discounted(self):
+        self.dynamics_model = MctsEnvDynamicsModel(self.env, discount=0.9)
+        # Check some conditions first.
+        states = [0] * 9
+        states[4] = 1
+        states[0] = 4
+        self.assertEqual((False, 0.0), self.env.check(states))
+        self.assertEqual(1, self.env.opponent_play(states))
+
+        predicted_value, final_info = self.dynamics_model.get_predicted_value_and_final_info(states)
+        self.assertEqual(-.9, predicted_value)
+        # Game ended for an illegal move.
+        self.assertEqual([4, 4, 0, 0, 1, 1, 0, 0, 0], final_info[0])  # states
+        self.assertEqual(5, final_info[1])  # action
+
     def test_get_predicted_value_and_final_info(self):
         # Check some conditions first.
         states = [0] * 9
