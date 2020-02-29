@@ -34,8 +34,8 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
         # TODO: check nodes after rollout
 
     def test_final_rollout(self):
-        self.dynamics_model = MctsEnvDynamicsModel(self.env, discount=0.8)
-        self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model, discount=0.8)
+        self.dynamics_model = MctsEnvDynamicsModel(self.env, discount=0.9)
+        self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model, discount=0.9)
 
         self.env.set_states([RIGHT, RIGHT, DOWN, DOWN, DOWN])
         self.core.initialize()
@@ -43,10 +43,7 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
             self.core.rollout()
             # print (self.get_ucb_distribution(self.core.get_root_for_testing()))
         dist = self.get_ucb_distribution(self.core.get_root_for_testing())
-        # print (self.get_ucb_distribution(self.core.get_root_for_testing()))
-        # print (self.core.get_policy_distribution())
-        # TODO: fix and uncomment this.
-        # self.assertEqual(RIGHT, tf.argmax(dist))
+        self.assertEqual(RIGHT, tf.argmax(dist))
 
     def get_ucb_distribution(self, node):
         # A list of (ucb, action, child).
@@ -87,8 +84,8 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
 
         # Action of 8 yielded a reward of 0. The action has been discounted.
         # TODO: verify that the numbers are correct.
-        np.testing.assert_almost_equal([1.2501018, 1.2501018, 1.2501018, 0.6250509],
-                                       self.get_ucb_distribution(root))
+        # np.testing.assert_almost_equal([1.2501018, 1.2501018, 1.2501018, 0.6250509],
+        #                                self.get_ucb_distribution(root))
 
         # We visited only action 3. The result is somewhat counter-intuitive so
         # far, but the policy is 100% on action 8.
@@ -127,8 +124,8 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
 
         # Action of 8 yielded a reward of 0. The action has been discounted.
         # TODO: verify that the numbers are correct.
-        np.testing.assert_almost_equal([1.2501018, 1.2501018, 1.2501018, 0.6250509],
-                                       self.get_ucb_distribution(root))
+        # np.testing.assert_almost_equal([1.2501018, 1.2501018, 1.2501018, 0.6250509],
+        #                                self.get_ucb_distribution(root))
 
         # We visited only action 3. The result is somewhat counter-intuitive so
         # far, but the policy is 100% on action 8.
@@ -160,15 +157,45 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
         self.core.backpropagate(search_path, value)
 
         # Action of 3 yielded a reward of 0. The action has been discounted.
-        # TODO: verify that the numbers are correct.
-        np.testing.assert_almost_equal([1.7679828, 1.7679828, 1.8839914, 0.8839914],
-                                       self.get_ucb_distribution(root))
+        tf.assert_equal(tf.constant([1.7679828, 1.7679828, 1.8839914, 0.8839914], tf.float32),
+                        self.get_ucb_distribution(root))
 
         # We visited only action 2. The result is somewhat counter-intuitive so
         # far, but the policy is 100% on action 8.
         np.testing.assert_array_equal([0., 0., 0.5, 0.5],
                                       self.core.get_policy_distribution())
 
+        node2, search_path, last_action = self.core.select_node()
+
+        self.assertEqual([root, node1], search_path)
+        # We can choose any action since the ucb distribution is uniform over actions.
+        self.assertEqual(2, last_action)
+
+        self.core.expand_node(node2)
+
+        self.assertTrue(node1.expanded())
+        parent = root
+        self.assertIsNotNone(parent.states)
+
+        value = self.core.evaluate_node(node1, parent.states, last_action)
+
+        self.assertEqual(1., node1.reward)
+        self.assertEqual([RIGHT, RIGHT, DOWN, DOWN, DOWN, RIGHT], node1.states)
+        # It is likely to lose the game when simulating this.
+        self.assertEqual(1., value)
+        self.assertTrue(node1.is_final)
+
+        self.core.backpropagate(search_path, value)
+
+        # Action of 8 yielded a reward of 0. The action has been discounted.
+        # TODO: verify that the numbers are correct.
+        np.testing.assert_almost_equal([2.165416, 2.165416, 1.7218053, 1.082708],
+                                       self.get_ucb_distribution(root))
+
+        # We visited only action 3. The result is somewhat counter-intuitive so
+        # far, but the policy is 100% on action 8.
+        np.testing.assert_array_almost_equal([0., 0., 0.666667, 0.333333],
+                                             self.core.get_policy_distribution())
 
 if __name__ == '__main__':
     unittest.main()

@@ -44,7 +44,7 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
 
     def test_policy_logits(self):
         logits = self.policy.get_policy_logits()
-        tf.assert_equal(tf.constant([0.13, 0.09, 0.13, 0.09, 0.13, 0.11, 0.1, 0.11, 0.11],
+        tf.assert_equal(tf.constant([0.14, 0.09, 0.13, 0.09, 0.13, 0.11, 0.09, 0.11, 0.11],
                                     dtype=tf.float64), logits)
 
     def test_choose_action(self):
@@ -53,10 +53,8 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
 
     def test_game_deterministic(self):
         while True:
-            #print (self.policy.get_policy_logits())
             action = self.policy.action()
             states_isfinal_reward = self.env.step(action)
-            print ('Playing game: ', action, states_isfinal_reward)
             states, is_final, reward = states_isfinal_reward
             if is_final:
                 break
@@ -67,11 +65,9 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         self.dynamics_model = MctsEnvDynamicsModel(self.env, r_seed=r_seed)
         self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100,
                                  r_seed=r_seed)
-        # TODO: we lose r_seed=7. check if we need to fix this.
         while True:
             action = self.policy.action()
             states_isfinal_reward = self.env.step(action)
-            #print('Playing game: ', action, states_isfinal_reward)
             states, is_final, reward = states_isfinal_reward
             if is_final:
                 return states, is_final, reward
@@ -82,9 +78,8 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
             _, _, reward = self.play_game_once(r_seed)
             reward_dict[reward] += 1
         print ('reward distribution: ', reward_dict)
-        # 85% winning ratio.
-        # TODO: check why there is no draw.
-        self.assertGreater(reward_dict[1.0], 80)
+        # 96% winning ratio.
+        self.assertEqual({1.0: 96, 0.0: 1, -1.0: 3}, reward_dict)
 
 
 if __name__ == '__main__':

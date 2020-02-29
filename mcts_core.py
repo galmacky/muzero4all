@@ -50,6 +50,7 @@ class MctsCore(object):
         self._action_history = []
 
     def _ucb_score(self, parent, child):
+        # return child.value() + math.log(2) * math.sqrt(math.log(parent.visit_count + 1) / (child.visit_count + 1))
         pb_c = math.log((parent.visit_count + self._pb_c_base + 1) /
                         self._pb_c_base) + self._pb_c_init
         pb_c *= math.sqrt(parent.visit_count) / (child.visit_count + 1)
@@ -57,7 +58,6 @@ class MctsCore(object):
         prior_score = pb_c * child.prior
         value_score = child.value()
         return prior_score + value_score
-        # return child.value() + math.log(2) * math.sqrt(math.log(parent.visit_count + 1) / (child.visit_count + 1))
 
     def initialize(self):
         states = self.dynamics_model.get_initial_states()
@@ -80,7 +80,7 @@ class MctsCore(object):
         search_path = [node]
 
         last_action = None
-        while node.expanded():
+        while not node.is_final and node.expanded():
             action, node = self.select_child(node)
             last_action = action
             search_path.append(node)
@@ -95,7 +95,7 @@ class MctsCore(object):
                 for action, child in node.children.items()]
 
     def expand_node(self, node):
-        if node.expanded():
+        if node.is_final or node.expanded():
             return
         for action in self._env.action_space:
             node.children[action] = Node()

@@ -33,27 +33,15 @@ class FrozenLakeMctsPolicyTest(unittest.TestCase):
     def test_final(self):
         # Move to the left of Goal state.
         self.env.set_states([RIGHT, RIGHT, DOWN, DOWN, DOWN])
-        logits = self.policy.get_policy_logits()
-        # TODO: fix this and uncomment this.
-        # tf.assert_equal(tf.constant([0.24, 0.31, 0.21, 0.24], tf.double), logits)
-        # self.assertEqual(RIGHT, self.policy.choose_action(logits))
-        # self.assertEqual(RIGHT, self.policy.action())
+        self.assertEqual(RIGHT, self.policy.action())
 
     def test_game_deterministic(self):
         while range(100):
-            logits = self.policy.get_policy_logits()
-            print (logits)
-            action = self.policy.choose_action(logits)
-            print ('Playing game: ', action)
-
+            action = self.policy.action()
             states, is_final, reward = self.env.step(action)
-            break  # TODO: remove this once we fix this test.
             if is_final:
                 break
-            self.env.env.render()
-
-        # TODO: uncomment this once we fix this test.
-        #self.assertEqual(1.0, reward)
+        self.assertEqual(1.0, reward)
 
 
 if __name__ == '__main__':
