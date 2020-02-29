@@ -39,10 +39,11 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
 
         self.env.set_states([RIGHT, RIGHT, DOWN, DOWN, DOWN])
         self.core.initialize()
-        for _ in range(3000):
+        # Try increasing the number of run if this fails.
+        for _ in range(300):
             self.core.rollout()
-            # print (self.get_ucb_distribution(self.core.get_root_for_testing()))
         dist = self.get_ucb_distribution(self.core.get_root_for_testing())
+        # print (dist)
         self.assertEqual(RIGHT, tf.argmax(dist))
 
     def get_ucb_distribution(self, node):
@@ -196,6 +197,7 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
         # far, but the policy is 100% on action 8.
         np.testing.assert_array_almost_equal([0., 0., 0.666667, 0.333333],
                                              self.core.get_policy_distribution())
+
 
 if __name__ == '__main__':
     unittest.main()
