@@ -1,5 +1,4 @@
 
-import copy
 import numpy as np
 
 from mcts_env import MctsEnv
@@ -9,8 +8,6 @@ class TicTacToeEnv(MctsEnv):
 
     def __init__(self, r_seed=0, use_random=False):
         super(TicTacToeEnv, self).__init__(action_space=range(0, 9))
-        # This is a multiplier in UCB algorithm. 1.0 means no prior.
-        self.default_policy_prior = {k: 1. for k in range(9)}
         self._states = [0] * 9
         self.r_seed_init = r_seed
         self.r_seed = r_seed
