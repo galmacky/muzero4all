@@ -31,7 +31,7 @@ class MctsPolicy(Policy):
         #print (policy_logits)
         return policy_logits
 
-    def sample_action(self, logits):
+    def choose_action(self, logits):
         #tf.random.set_seed(self.r_seed)
         #action = tf.random.categorical(logits=tf.math.log(logits), num_samples=1, seed=self.r_seed)
         #self.r_seed += 1
@@ -43,5 +43,4 @@ class MctsPolicy(Policy):
         return action
 
     def action(self):
-        sampled_action = self.sample_action(self.get_policy_logits())
-        return sampled_action, self.env.step(sampled_action)
+        return self.choose_action(self.get_policy_logits())

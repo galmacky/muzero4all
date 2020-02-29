@@ -15,7 +15,8 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100)
 
     def test_action_start(self):
-        action, states_isfinal_reward = self.policy.action()
+        action = self.policy.action()
+        states_isfinal_reward = self.env.step(action)
         self.assertEqual(0, action)
         self.assertEqual(([1, 4, 0, 0, 0, 0, 0, 0, 0], False, 0.0), states_isfinal_reward)
 
@@ -23,7 +24,8 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         self.env.set_states([1, 0, 1,
                              1, 0, 4,
                              4, 4, 0])
-        action, states_isfinal_reward = self.policy.action()
+        action = self.policy.action()
+        states_isfinal_reward = self.env.step(action)
         self.assertEqual(1, action)
         self.assertEqual(([1, 1, 1,
                            1, 0, 4,
@@ -33,7 +35,8 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         self.env.set_states([1, 1, 4,
                              0, 0, 4,
                              1, 4, 0])
-        action, states_isfinal_reward = self.policy.action()
+        action = self.policy.action()
+        states_isfinal_reward = self.env.step(action)
         self.assertEqual(3, action)
         self.assertEqual(([1, 1, 4,
                            1, 0, 4,
@@ -44,14 +47,15 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
         tf.assert_equal(tf.constant([0.13, 0.09, 0.13, 0.09, 0.13, 0.11, 0.1, 0.11, 0.11],
                                     dtype=tf.float64), logits)
 
-    def test_sample_action(self):
-        self.assertEqual(1, self.policy.sample_action(tf.constant(
+    def test_choose_action(self):
+        self.assertEqual(1, self.policy.choose_action(tf.constant(
             [0.11, 0.116, 0.11, 0.11, 0.11, 0.111, 0.111, 0.111, 0.111])))
 
     def test_game_deterministic(self):
         while True:
             #print (self.policy.get_policy_logits())
-            action, states_isfinal_reward = self.policy.action()
+            action = self.policy.action()
+            states_isfinal_reward = self.env.step(action)
             print ('Playing game: ', action, states_isfinal_reward)
             states, is_final, reward = states_isfinal_reward
             if is_final:
@@ -65,7 +69,8 @@ class TicTacToeMctsPolicyTest(unittest.TestCase):
                                  r_seed=r_seed)
         # TODO: we lose r_seed=7. check if we need to fix this.
         while True:
-            action, states_isfinal_reward = self.policy.action()
+            action = self.policy.action()
+            states_isfinal_reward = self.env.step(action)
             #print('Playing game: ', action, states_isfinal_reward)
             states, is_final, reward = states_isfinal_reward
             if is_final:

@@ -57,16 +57,21 @@ class FrozenLakeDetEnv(MctsEnv):
         )
         return ansi_escape_8bit.sub('', ansi_str)
 
-    # Set a state by going through all of the actions in states, starting
-    # from the beginning.
     def set_states(self, states):
-        """states is a list of actions."""
+        """Set the given states.
+
+        Set a state by going through all of the actions in states, starting
+        from the beginning.
+
+        Args:
+            states: A list of actions to get to the states.
+        """
         self.reset()
         for action in states:
             self.step(action)
 
-    # Take a step and append to the list of actions stored in self._states.
     def step(self, action):
+        # TODO: remove this once we fix action to be non-tensor.
         action = int(action)
         _, rew, done , _ = self.env.step(action)
 

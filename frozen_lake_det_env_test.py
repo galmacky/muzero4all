@@ -1,11 +1,11 @@
 
 import unittest
 
-from frozen_lake_det_env import FrozenLakeDetEnv
 from gym.envs.toy_text.frozen_lake import LEFT
 from gym.envs.toy_text.frozen_lake import RIGHT
 from gym.envs.toy_text.frozen_lake import DOWN
 from gym.envs.toy_text.frozen_lake import UP
+from frozen_lake_det_env import FrozenLakeDetEnv
 
 
 class FrozenLakeDetEnvTest(unittest.TestCase):
