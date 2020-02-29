@@ -1,52 +1,71 @@
 
-
-import gym
+import re
+import unittest
 
 from frozen_lake_det_env import FrozenLakeEnv
-from gym.envs.toy_text import frozen_lake, discrete
+from gym.envs.toy_text import frozen_lake
 
-fl_env = FrozenLakeEnv()
-env = fl_env.env
-for _ in range(10):
-	env.render()
-	# Take random action.
-	fl_env.step(env.action_space.sample())
 
-print("Set State: ")
-fl_env.reset()
-actions = [
-	frozen_lake.RIGHT,
-	frozen_lake.RIGHT,
-	frozen_lake.DOWN,
-]
+class TicTacToeMctsPolicyTest(unittest.TestCase):
 
-fl_env.set_states(actions)
-env.render()
+    def setUp(self):
+        self.env = FrozenLakeEnv()
 
-print("Is Final good: ")
-fl_env.reset()
-actions = [
-	frozen_lake.RIGHT,
-	frozen_lake.RIGHT,
-	frozen_lake.DOWN,
-	frozen_lake.DOWN,
-	frozen_lake.DOWN,
-	frozen_lake.RIGHT,
-]
+    def tearDown(self):
+        self.env.env.close()
 
-for action in actions:
-	new_states, done, rew = fl_env.step(action)
-	print(new_states, done, rew)
+    def get_real_states(self):
+        """Returns env's real states not the action history."""
+        return self.remove_ansi(self.env.env.render(mode='ansi').getvalue())
+        #    return rendered_textiowrapper.read()
 
-print("Is Final bad: ")
-fl_env.reset()
-actions = [
-	frozen_lake.RIGHT,
-	frozen_lake.DOWN,
-]
+    def remove_ansi(self, ansi_str):
+        ansi_escape_8bit = re.compile(
+            r'(?:\x1B[@-Z\\-_]|[\x80-\x9A\x9C-\x9F]|(?:\x1B\[|\x9B)[0-?]*[ -/]*[@-~])'
+        )
+        return ansi_escape_8bit.sub('', ansi_str)
 
-for action in actions:
-	new_states, done, rew = fl_env.step(action)
-	print(new_states, done, rew)
 
-env.close()
+    def test_init(self):
+        self.assertEqual('\nSFFF\nFHFH\nFFFH\nHFFG\n', self.get_real_states())
+
+    def test_win(self):
+        actions = [
+            frozen_lake.RIGHT,
+            frozen_lake.RIGHT,
+            frozen_lake.DOWN,
+            frozen_lake.DOWN,
+            frozen_lake.DOWN,
+        ]
+
+        for action in actions:
+            new_states, is_final, reward = self.env.step(action)
+
+        self.assertFalse(is_final)
+        self.assertEqual(0.0, reward)
+        self.assertEqual(actions, new_states)
+        self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.get_real_states())
+
+        new_states, is_final, reward = self.env.step(frozen_lake.RIGHT)
+
+        self.assertTrue(is_final)
+        self.assertEqual(1.0, reward)
+        self.assertEqual(actions + [frozen_lake.RIGHT], new_states)
+        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.get_real_states())
+
+    def test_hole(self):
+        actions = [
+            frozen_lake.RIGHT,
+            frozen_lake.DOWN,
+        ]
+
+        for action in actions:
+            new_states, is_final, reward = self.env.step(action)
+        self.assertTrue(is_final)
+        self.assertEqual(0.0, reward)
+        self.assertEqual(actions, new_states)
+        self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.get_real_states())
+
+
+if __name__ == '__main__':
+    unittest.main()
