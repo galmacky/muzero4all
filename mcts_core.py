@@ -35,9 +35,9 @@ class Node(object):
 class MctsCore(object):
     """A core engine for MCTS."""
 
-    def __init__(self, env, dynamics_model, discount=1., ucb_score_fn=None):
+    def __init__(self, env, model, discount=1., ucb_score_fn=None):
         self._env = env
-        self.dynamics_model = dynamics_model
+        self.model = model
         self.discount = discount
         if ucb_score_fn is not None:
             self._ucb_score_fn = ucb_score_fn
@@ -60,7 +60,7 @@ class MctsCore(object):
         return prior_score + value_score
 
     def initialize(self):
-        states = self.dynamics_model.get_initial_states()
+        states = self.model.get_initial_states()
         self._root = Node(states)
         assert self._root.states is not None
         self.expand_node(self._root)
@@ -101,7 +101,7 @@ class MctsCore(object):
             node.children[action] = Node()
 
     def evaluate_node(self, node, parent_state, last_action):
-        states, is_final, reward, policy_dict, predicted_value = self.dynamics_model.step(
+        states, is_final, reward, policy_dict, predicted_value = self.model.step(
                 parent_state, last_action)
         for action in node.children.keys():
             node.children[action].prior = policy_dict[action]

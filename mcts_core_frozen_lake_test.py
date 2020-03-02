@@ -16,8 +16,8 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = FrozenLakeDetEnv()
-        self.dynamics_model = BasicMctsModel(self.env)
-        self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model)
+        self.model = BasicMctsModel(self.env)
+        self.core = MctsCore(env=self.env, model=self.model)
 
     def test_initial_rollout(self):
         self.core.initialize()
@@ -34,8 +34,8 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
         # TODO: check nodes after rollout
 
     def test_final_rollout(self):
-        self.dynamics_model = BasicMctsModel(self.env, discount=0.9)
-        self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model, discount=0.9)
+        self.model = BasicMctsModel(self.env, discount=0.9)
+        self.core = MctsCore(env=self.env, model=self.model, discount=0.9)
 
         self.env.set_states([RIGHT, RIGHT, DOWN, DOWN, DOWN])
         self.core.initialize()

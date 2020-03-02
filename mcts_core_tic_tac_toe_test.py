@@ -11,8 +11,8 @@ class MctsCoreTicTacToeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = TicTacToeEnv()
-        self.dynamics_model = BasicMctsModel(self.env)
-        self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model)
+        self.model = BasicMctsModel(self.env)
+        self.core = MctsCore(env=self.env, model=self.model)
 
     def test_rollout(self):
         self.core.initialize()

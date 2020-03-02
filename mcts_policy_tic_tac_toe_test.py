@@ -11,8 +11,8 @@ from tic_tac_toe_env import TicTacToeEnv
 class MctsPolicyTicTacToeTest(unittest.TestCase):
     def setUp(self):
         self.env = TicTacToeEnv()
-        self.dynamics_model = BasicMctsModel(self.env)
-        self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100)
+        self.model = BasicMctsModel(self.env)
+        self.policy = MctsPolicy(self.env, self.model, num_simulations=100)
 
     def test_action_start(self):
         action = self.policy.action()
@@ -62,8 +62,8 @@ class MctsPolicyTicTacToeTest(unittest.TestCase):
 
     def play_game_once(self, r_seed):
         self.env = TicTacToeEnv(use_random=True, r_seed=r_seed)
-        self.dynamics_model = BasicMctsModel(self.env, r_seed=r_seed)
-        self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100,
+        self.model = BasicMctsModel(self.env, r_seed=r_seed)
+        self.policy = MctsPolicy(self.env, self.model, num_simulations=100,
                                  r_seed=r_seed)
         while True:
             action = self.policy.action()

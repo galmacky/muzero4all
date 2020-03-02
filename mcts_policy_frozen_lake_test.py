@@ -14,8 +14,8 @@ class MctsPolicyFrozenLakeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = FrozenLakeDetEnv()
-        self.dynamics_model = BasicMctsModel(self.env, discount=1.)
-        self.policy = MctsPolicy(self.env, self.dynamics_model,
+        self.model = BasicMctsModel(self.env, discount=1.)
+        self.policy = MctsPolicy(self.env, self.model,
                                  num_simulations=100, discount=1.)
 
     def test_second_to_final(self):
