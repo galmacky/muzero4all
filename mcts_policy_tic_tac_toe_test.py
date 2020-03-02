@@ -3,7 +3,7 @@ import collections
 import tensorflow as tf
 import unittest
 
-from mcts_env_dynamics_model import MctsEnvDynamicsModel
+from basic_mcts_model import BasicMctsModel
 from mcts_policy import MctsPolicy
 from tic_tac_toe_env import TicTacToeEnv
 
@@ -11,7 +11,7 @@ from tic_tac_toe_env import TicTacToeEnv
 class MctsPolicyTicTacToeTest(unittest.TestCase):
     def setUp(self):
         self.env = TicTacToeEnv()
-        self.dynamics_model = MctsEnvDynamicsModel(self.env)
+        self.dynamics_model = BasicMctsModel(self.env)
         self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100)
 
     def test_action_start(self):
@@ -62,7 +62,7 @@ class MctsPolicyTicTacToeTest(unittest.TestCase):
 
     def play_game_once(self, r_seed):
         self.env = TicTacToeEnv(use_random=True, r_seed=r_seed)
-        self.dynamics_model = MctsEnvDynamicsModel(self.env, r_seed=r_seed)
+        self.dynamics_model = BasicMctsModel(self.env, r_seed=r_seed)
         self.policy = MctsPolicy(self.env, self.dynamics_model, num_simulations=100,
                                  r_seed=r_seed)
         while True:

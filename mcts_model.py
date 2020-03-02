@@ -2,7 +2,7 @@
 import abc
 
 
-class MctsDynamicsModel(object):
+class MctsModel(object):
     """This is a plug-in architecture for MCTS core. TODO: the name is somewhat misleading. Rename this."""
     __metaclass__ = abc.ABCMeta
 

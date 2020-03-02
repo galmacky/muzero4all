@@ -8,7 +8,7 @@ from gym.envs.toy_text.frozen_lake import RIGHT
 from gym.envs.toy_text.frozen_lake import DOWN
 from gym.envs.toy_text.frozen_lake import UP
 from mcts_core import MctsCore
-from mcts_env_dynamics_model import MctsEnvDynamicsModel
+from basic_mcts_model import BasicMctsModel
 from frozen_lake_det_env import FrozenLakeDetEnv
 
 
@@ -16,7 +16,7 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = FrozenLakeDetEnv()
-        self.dynamics_model = MctsEnvDynamicsModel(self.env)
+        self.dynamics_model = BasicMctsModel(self.env)
         self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model)
 
     def test_initial_rollout(self):
@@ -34,7 +34,7 @@ class MctsCoreFrozenLakeTest(unittest.TestCase):
         # TODO: check nodes after rollout
 
     def test_final_rollout(self):
-        self.dynamics_model = MctsEnvDynamicsModel(self.env, discount=0.9)
+        self.dynamics_model = BasicMctsModel(self.env, discount=0.9)
         self.core = MctsCore(env=self.env, dynamics_model=self.dynamics_model, discount=0.9)
 
         self.env.set_states([RIGHT, RIGHT, DOWN, DOWN, DOWN])

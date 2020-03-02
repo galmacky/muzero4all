@@ -1,18 +1,18 @@
 
 import unittest
 
-from mcts_env_dynamics_model import MctsEnvDynamicsModel
+from basic_mcts_model import BasicMctsModel
 from tic_tac_toe_env import TicTacToeEnv
 
 
-class MctsEnvDynamicsModelTest(unittest.TestCase):
+class BasicMctsModelTest(unittest.TestCase):
 
     def setUp(self):
         self.env = TicTacToeEnv()
-        self.dynamics_model = MctsEnvDynamicsModel(self.env)
+        self.dynamics_model = BasicMctsModel(self.env)
 
     def test_get_predicted_value_and_final_info_discounted(self):
-        self.dynamics_model = MctsEnvDynamicsModel(self.env, discount=0.9)
+        self.dynamics_model = BasicMctsModel(self.env, discount=0.9)
         # Check some conditions first.
         states = [0] * 9
         states[4] = 1

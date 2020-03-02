@@ -1,8 +1,8 @@
 
-from mcts_dynamics_model import MctsDynamicsModel
+from mcts_model import MctsModel
 
 
-class MuZeroDynamicsModel(MctsDynamicsModel):
+class MuZeroMctsModel(MctsModel):
 
     def __init__(self, env, network):
         self.env = env

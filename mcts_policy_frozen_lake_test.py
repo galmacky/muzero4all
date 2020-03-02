@@ -5,7 +5,7 @@ from gym.envs.toy_text.frozen_lake import LEFT
 from gym.envs.toy_text.frozen_lake import RIGHT
 from gym.envs.toy_text.frozen_lake import DOWN
 from gym.envs.toy_text.frozen_lake import UP
-from mcts_env_dynamics_model import MctsEnvDynamicsModel
+from basic_mcts_model import BasicMctsModel
 from mcts_policy import MctsPolicy
 from frozen_lake_det_env import FrozenLakeDetEnv
 
@@ -14,7 +14,7 @@ class MctsPolicyFrozenLakeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = FrozenLakeDetEnv()
-        self.dynamics_model = MctsEnvDynamicsModel(self.env, discount=1.)
+        self.dynamics_model = BasicMctsModel(self.env, discount=1.)
         self.policy = MctsPolicy(self.env, self.dynamics_model,
                                  num_simulations=100, discount=1.)
 

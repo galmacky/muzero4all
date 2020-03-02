@@ -2,11 +2,11 @@
 import copy
 import numpy as np
 
-from mcts_dynamics_model import MctsDynamicsModel
+from mcts_model import MctsModel
 
 
-class MctsEnvDynamicsModel(MctsDynamicsModel):
-    """Dynamics model for pure MCTS."""
+class BasicMctsModel(MctsModel):
+    """A basic model for pure MCTS."""
 
     def __init__(self, env, discount=1., max_depth=100, r_seed=0):
         # This is a multiplier in UCB algorithm. 1.0 means no prior.
