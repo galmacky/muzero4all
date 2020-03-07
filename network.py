@@ -1,3 +1,5 @@
+from network_initializer import NetworkInitializer
+
 #This is just a placeholder
 class Action(object):
     """ Class that represent an action of a game."""
@@ -14,18 +16,26 @@ class Action(object):
     def __gt__(self, other):
         return self.index > other.index
 
+'''
+    Interface for the output of the Network
+'''
 class NetworkOutput(typing.NamedTuple):
     value: float
     reward: float
     policy_logits: Dict[Action, float]
     hidden_state: List[float]
 
+'''
+    Generic network class, pass in the initializer for game model (Tic Tac Toe, or Atari)
+    to build the model.
+'''
 class Network(object):
 
-    def __init__(self):
-        self.representation = None
-        self.dynamics = None
-        self.prediction = None
+    def __init__(self, initializer: NetworkInitializer):
+        (prediction_network, dynamics_network, representation_network) = initializer.initialize()
+        self.representation = representation_network
+        self.dynamics = dynamics_network
+        self.prediction = prediction_network
 
     def initial_inference(self, image) -> NetworkOutput:
         # representation + prediction function
