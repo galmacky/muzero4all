@@ -15,7 +15,10 @@ for i in range(100):
     print('Iteration i: %s' % i)
     env.render()
     # Take random action.
-    mcts_env.step(env.action_space.sample())
+    action = env.action_space.sample()
+    new_states, done, rew = mcts_env.step(
+        action)
+    print('Action: %s\nReward: %s' % (action, rew))
 
 
 # print("Set State: ")
