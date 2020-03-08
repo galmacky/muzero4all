@@ -1,3 +1,5 @@
+import typing
+
 from network_initializer import NetworkInitializer
 
 #This is just a placeholder
@@ -22,8 +24,8 @@ class Action(object):
 class NetworkOutput(typing.NamedTuple):
     value: float
     reward: float
-    policy_logits: Dict[Action, float]
-    hidden_state: List[float]
+    policy_logits: typing.Dict[Action, float]
+    hidden_state: typing.List[float]
 
 '''
     Generic network class, pass in the initializer for game model (Tic Tac Toe, or Atari)
