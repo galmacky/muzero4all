@@ -34,9 +34,6 @@ class FrozenLakeDetEnv(MctsEnv):
         # Number of actions (Frozen lake is discrete).
         nA = self.env.action_space.n
 
-        # TODO(changwan): Does is this how you want aciton_space to be defined? 
-        # just a list of ints?????????????????????
-
         super(FrozenLakeDetEnv, self).__init__(action_space=range(nA))
 
     def reset(self):
