@@ -12,7 +12,7 @@ class MctsPolicyFrozenLakeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = PacmanDetEnv()
-        self.model = BasicMctsModel(self.env, discount=1.)
+        self.model = BasicMctsModel(self.env, discount=1., max_depth=10)
         self.policy = MctsPolicy(self.env, self.model,
                                  num_simulations=10, discount=1.)
 
@@ -35,11 +35,12 @@ class MctsPolicyFrozenLakeTest(unittest.TestCase):
             print('Starting action calculation')
             action = self.policy.action()
             end_time = time.time()
-            print('Action at iter %s: %s\nCalc time: %s' 
-                % (idx, action, end_time - start_time))
             states, is_final, reward = self.env.step(action)
+            print('Action at iter %s: %s\nReward: %s\nCalc time: %s' 
+                % (idx, action, reward, end_time - start_time))
             if is_final:
                 break
+            self.env.env.render()
         self.assertEqual(1.0, reward)
 
 
