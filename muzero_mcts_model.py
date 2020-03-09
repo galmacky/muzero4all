@@ -14,7 +14,7 @@ class MuZeroMctsModel(MctsModel):
     def get_initial_states(self):
         # TODO
         return [0] * 9
-        return self.network.encode(self.env.get_states())
+        return self.network.initial_inference(self.env.get_states())
 
     def reset(self):
         # This is called when we call policy.reset()

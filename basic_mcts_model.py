@@ -47,7 +47,6 @@ class BasicMctsModel(MctsModel):
             self.r_seed += 1
             action = np.random.choice(a=self.env.action_space)
 
-            self.env.set_states(states)
             states, is_final, reward = self.env.step(action)
             returns += acc_discount * reward
             acc_discount *= self.discount
