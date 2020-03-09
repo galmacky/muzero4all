@@ -41,8 +41,8 @@ class FrozenLakeDetEnvTest(unittest.TestCase):
         self.assertEqual(1.0, reward)
         self.assertEqual([RIGHT, RIGHT, DOWN, DOWN, DOWN, RIGHT], new_states)
         self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
+        # self.env.env.render()
 
-    # self.env.env.render()
     def test_win(self):
         actions = [RIGHT, RIGHT, DOWN, DOWN, DOWN]
         for action in actions:
