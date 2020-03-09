@@ -17,18 +17,99 @@ class NetworkInitializer(object):
 
 '''
 	Builds the dynamics, representation, and prediction
-	models for playing Frozen Lake games.
-'''
-class TicTacToeInitializer(NetworkInitializer):
-
-	def initialize(self):
-		pass
-
-'''
-	Builds the dynamics, representation, and prediction
 	models for playing Tic Tac Toe games.
 '''
 class TicTacToeInitializer(NetworkInitializer):
+
+	
+	class PredictionNetwork(tf.keras.Model):
+		'''
+		Creates a network that returns the policy logits and the value
+		returns : policy_logits, value 
+		'''
+		def __init__(self):
+			super(PredictionNetwork, self).__init__()
+			#Define model here
+			hidden_size = 64
+			action_size = 9 #3x3 board
+			self.base1 = layers.Dense(hidden_size, activation='relu')
+    		self.policy1 = layers.Dense(action_size, activation='softmax')
+    		self.value1 = layers.Dense(1, activation='sigmoid') #Is this correct activation function?
+
+		def call(self, inputs):
+			x = self.base1(inputs)
+			policy_logits = self.policy1(x)
+			value = self.policy1(x)
+			return (policy_logits, value)
+
+	class DynamicsNetwork(tf.keras.Model):
+		'''
+		Given the current hidden state and action, transition to the next hidden state given action.
+		inputs: hidden_state: current hidden state of muzero algorithm, action: action taken from current hidden state)
+		returns: hidden_state: next hidden state, reward: reward from current hidden state.
+		
+		Actions are encoded spatially in planes of the same resolution as the hidden state. In Atari, this resolution is 6x6 (see description of downsampling in Network Architecture section), in board games this is the same as the board size (19x19 for Go, 8x8 for chess, 9x9 for shogi). 1
+		'''
+		def __init__(self):
+			super(PredictionNetwork, self).__init__()
+			hidden_size = 64
+			action_size = 9 #3x3 board
+			self.base1 = layers.Dense(hidden_size, activation='relu')
+    		self.base2 = layers.Dense(action_size, activation='relu')
+
+		'''
+		Input is hidden state concat 2 one hot encodings of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
+		'''
+		def call(self, inputs):
+			x = self.base1(inputs)
+			x = self.base1(x)
+			return x
+
+	class RepresentationNetwork(tf.keras.Model):
+		'''
+		Converts the initial state of the gameboard to the muzero hidden state representation.
+		inputs: initial state
+		returns: hidden state
+		'''
+		def __init__(self):
+			super(PredictionNetwork, self).__init__()
+			hidden_size = 64
+			action_size = 9 #3x3 board
+			self.base1 = layers.Dense(hidden_size, activation='relu')
+			self.base2 = layers.Dense(hidden_size, activation='relu')
+
+		def call(self, inputs):
+			x = self.base1(inputs)
+			x = self.base1(x)
+			return x
+
+	def initialize(self):
+		hidden_size = 64
+		action_size = 9 #3x3 board
+		# prediction_network = models.Sequential()
+		# prediction_network.add(layers.Dense(hidden_size))
+		# prediction_network.add(layers.Dense(action_size))
+		prediction_network = PredictionNetwork()
+
+		dynamics_network = models.Sequential()
+		dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+		dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+		dynamics_network.add(layers.AveragePooling2D(pool_size=(3,3), strides=(3, 3)))
+		dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+
+		representation_network = RepresentationNetwork()
+		# representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+		# representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+		# representation_network.add(layers.AveragePooling2D(pool_size=(3,3), strides=(3, 3)))
+		# representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+
+		return (prediction_network, dynamics_network, representation_network)
+
+'''
+	Builds the dynamics, representation, and prediction
+	models for playing FrozenLake games.
+'''
+class FrozenLake(NetworkInitializer):
 
 	def initialize(self):
 		prediction_network = models.Sequential()
@@ -50,6 +131,7 @@ class TicTacToeInitializer(NetworkInitializer):
 
 		return (prediction_network, dynamics_network, representation_network)
 	
+
 '''
 	Builds the dynamics, representation, and prediction
 	models for playing Atari games.

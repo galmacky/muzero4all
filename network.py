@@ -46,7 +46,7 @@ class Network(object):
 
     def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
         # dynamics + prediction function
-        hidden_state, reward  = self.dynamics(hidden_state, action)
+        hidden_state = self.dynamics(hidden_state, action)
         policy_logits, value = self.prediction(hidden_state)
         return NetworkOutput(value, reward, policy_logits, hidden_state)
 
