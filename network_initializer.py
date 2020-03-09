@@ -15,6 +15,14 @@ class NetworkInitializer(object):
 	def initialize(self):
 		pass
 
+class Encoder(object):
+	__metaclass__ = abc.ABCMeta
+
+	@abc.abstractmethod
+	def encode(self, hidden_state, action):
+
+		pass
+
 '''
 	Builds the dynamics, representation, and prediction
 	models for playing Tic Tac Toe games.
@@ -93,11 +101,16 @@ class TicTacToeInitializer(NetworkInitializer):
 			hidden_state = representation_network(inputs)
 			return hidden_state
 
+	class DynamicsEncoder(Encoder):
+		def encode(self, hidden_state, action):
+			return tf.concat(hidden_state, tf.one_hot(action.index, 1))
+
 	def initialize(self):
 		prediction_network = PredictionNetwork()
 		dynamics_network = DynamicNetwork()
 		representation_network = RepresentationNetwork()
-		return (prediction_network, dynamics_network, representation_network)
+		dynamics_encoder = DynamicsEncoder()
+		return (prediction_network, dynamics_network, representation_network, dynamics_encoder)
 
 '''
 	Builds the dynamics, representation, and prediction
@@ -124,7 +137,6 @@ class FrozenLake(NetworkInitializer):
 		representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
 
 		return (prediction_network, dynamics_network, representation_network)
-	
 
 '''
 	Builds the dynamics, representation, and prediction
