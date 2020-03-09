@@ -18,7 +18,10 @@ class PacmanDetEnv(MctsEnv):
             self.env = gym.make("MsPacmanDeterministic-v0")
         else:
             # Deterministic using RAM as input (more efficient) for pure MCTS.
-            self.env = gym.make("MsPacman-ramDeterministic-v0")
+            # self.env = gym.make("MsPacman-ramDeterministic-v0")
+            # TODO(timkim): undo to deeterministic later
+            self.env = gym.make("MsPacman-v0") # CRAHSES FOR SOME REASON
+
         self.env.reset()
 
         seed = 1234
@@ -36,6 +39,8 @@ class PacmanDetEnv(MctsEnv):
         # Number of actions (Aliased by a map from int -> string
         # https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py#L219).
         nA = self.env.action_space.n
+        print("Created PacMan ENV with nA: %s\nAction Meanings: %s" % (
+            nA, self.env.get_action_meanings()))
 
         super(PacmanDetEnv, self).__init__(action_space=range(nA))
 
