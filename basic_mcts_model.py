@@ -39,6 +39,7 @@ class BasicMctsModel(MctsModel):
     def get_predicted_value_and_final_info(self, starting_states):
         depth = 0
         states = copy.deepcopy(starting_states)
+        self.env.set_states(states)
         # This is the 'simulation' step in the pure MCTS - random play.
         returns = 0.
         acc_discount = 1.
