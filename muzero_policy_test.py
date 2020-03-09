@@ -5,7 +5,7 @@ import tensorflow as tf
 
 from muzero_policy import MuZeroPolicy
 from tic_tac_toe_env import TicTacToeEnv
-
+from network_initializer import TicTacToeInitializer
 
 class MuZeroPolicyTicTacToeTest(unittest.TestCase):
     def setUp(self):
@@ -13,7 +13,7 @@ class MuZeroPolicyTicTacToeTest(unittest.TestCase):
 
     def initialize(self, use_random, r_seed):
         self.env = TicTacToeEnv(use_random=use_random, r_seed=r_seed)
-        self.network_initializer = None
+        self.network_initializer = TicTacToeInitializer()
         self.policy = MuZeroPolicy(self.env, self.network_initializer, num_simulations=100)
 
     def test_action_start(self):

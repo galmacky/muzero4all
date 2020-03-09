@@ -20,7 +20,6 @@ class Encoder(object):
 
 	@abc.abstractmethod
 	def encode(self, hidden_state, action):
-
 		pass
 
 '''
