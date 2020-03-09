@@ -20,8 +20,6 @@ class NetworkInitializer(object):
 	models for playing Tic Tac Toe games.
 '''
 class TicTacToeInitializer(NetworkInitializer):
-
-	
 	class PredictionNetwork(tf.keras.Model):
 		'''
 		Creates a network that returns the policy logits and the value
@@ -32,14 +30,18 @@ class TicTacToeInitializer(NetworkInitializer):
 			#Define model here
 			hidden_size = 64
 			action_size = 9 #3x3 board
-			self.base1 = layers.Dense(hidden_size, activation='relu')
-    		self.policy1 = layers.Dense(action_size, activation='softmax')
-    		self.value1 = layers.Dense(1, activation='sigmoid') #Is this correct activation function?
+			support_size = 10
+			self.policy_network = models.Sequential()
+			self.policy_network.add(layers.Dense(hidden_size, activation='relu'))
+			self.policy_network.add(layers.Dense(action_size, activation='relu'))
+			
+			self.value_network = models.Sequential()
+			self.value_network.add(layers.Dense(hidden_size, activation='relu'))
+			self.value_network.add(layers.Dense(2*support_size+1, activation='relu'))
 
 		def call(self, inputs):
-			x = self.base1(inputs)
-			policy_logits = self.policy1(x)
-			value = self.policy1(x)
+			policy_logits = self.policy_network(inputs)
+			value = self.value_network(inputs)
 			return (policy_logits, value)
 
 	class DynamicsNetwork(tf.keras.Model):
@@ -52,18 +54,25 @@ class TicTacToeInitializer(NetworkInitializer):
 		'''
 		def __init__(self):
 			super(PredictionNetwork, self).__init__()
+			representation_size = 64
 			hidden_size = 64
 			action_size = 9 #3x3 board
-			self.base1 = layers.Dense(hidden_size, activation='relu')
-    		self.base2 = layers.Dense(action_size, activation='relu')
+
+			self.dynamic_network = models.Sequential()
+			self.dynamic_network.add(layers.Dense(representation_size, activation='relu'))
+			self.dynamic_network.add(layers.Dense(hidden_size, activation='relu'))
+			
+			self.reward_network = models.Sequential()
+			self.reward_network.add(layers.Dense(representation_size, activation='relu'))
+			self.reward_network.add(layers.Dense(1, activation='relu'))
 
 		'''
-		Input is hidden state concat 2 one hot encodings of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
+		Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
 		'''
 		def call(self, inputs):
-			x = self.base1(inputs)
-			x = self.base1(x)
-			return x
+			next_hidden_state = self.dynamic_network(inputs)
+			reward = self.reward_network(inputs)
+			return (next_hidden_state, reward)
 
 	class RepresentationNetwork(tf.keras.Model):
 		'''
@@ -73,36 +82,21 @@ class TicTacToeInitializer(NetworkInitializer):
 		'''
 		def __init__(self):
 			super(PredictionNetwork, self).__init__()
+			representation_size = 64
 			hidden_size = 64
 			action_size = 9 #3x3 board
-			self.base1 = layers.Dense(hidden_size, activation='relu')
-			self.base2 = layers.Dense(hidden_size, activation='relu')
+			self.representation_network = models.Sequential()
+			self.representation_network.add(layers.Dense(representation_size, activation='relu'))
+			self.representation_network.add(layers.Dense(hidden_size, activation='relu'))
 
 		def call(self, inputs):
-			x = self.base1(inputs)
-			x = self.base1(x)
-			return x
+			hidden_state = representation_network(inputs)
+			return hidden_state
 
 	def initialize(self):
-		hidden_size = 64
-		action_size = 9 #3x3 board
-		# prediction_network = models.Sequential()
-		# prediction_network.add(layers.Dense(hidden_size))
-		# prediction_network.add(layers.Dense(action_size))
 		prediction_network = PredictionNetwork()
-
-		dynamics_network = models.Sequential()
-		dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-		dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-		dynamics_network.add(layers.AveragePooling2D(pool_size=(3,3), strides=(3, 3)))
-		dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-
+		dynamics_network = DynamicNetwork()
 		representation_network = RepresentationNetwork()
-		# representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-		# representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-		# representation_network.add(layers.AveragePooling2D(pool_size=(3,3), strides=(3, 3)))
-		# representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-
 		return (prediction_network, dynamics_network, representation_network)
 
 '''

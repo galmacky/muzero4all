@@ -40,13 +40,12 @@ class Network(object):
     def initial_inference(self, image) -> NetworkOutput:
         # representation + prediction function
         hidden_state = self.representation(image)
-        #Pretty sure  self.prediction doesn't return two things
         policy_logits, value = self.prediction(hidden_state)
         return NetworkOutput(value, 0, policy_logits, hidden_state)
 
     def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
         # dynamics + prediction function
-        hidden_state = self.dynamics(hidden_state, action)
+        hidden_state, reward = self.dynamics(hidden_state, action)
         policy_logits, value = self.prediction(hidden_state)
         return NetworkOutput(value, reward, policy_logits, hidden_state)
 
