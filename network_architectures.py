@@ -1,13 +1,13 @@
 import tensorflow as tf
-from keras.backend import sigmoid
-from keras.utils.generic_utils import get_custom_objects
-from keras.layers import Activation
+#from keras.backend import sigmoid
+#from keras.utils.generic_utils import get_custom_objects
+#from keras.layers import Activation
 
-def swish(x, beta = 1):
-    return (x * sigmoid(beta * x))
+#def swish(x, beta = 1):
+#    return (x * sigmoid(beta * x))
 
-#Register swish activation function. Can then do activation='swish' in layers.
-get_custom_objects().update({'swish': Activation(swish)})
+##Register swish activation function. Can then do activation='swish' in layers.
+#get_custom_objects().update({'swish': Activation(swish)})
 
 class ResnetIdentityBlock(tf.keras.Model):
   def __init__(self, kernel_size, filters):
