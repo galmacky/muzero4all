@@ -33,7 +33,7 @@ tensorboard==2.1.0
 tensorflow==2.1.0
 tensorflow-estimator==2.1.0
 gym[atari]
-gym==0.7.4
+gym==0.17.1
 termcolor==1.1.0
 urllib3==1.25.8
 virtualenv==20.0.4
