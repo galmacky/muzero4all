@@ -76,11 +76,11 @@ class PacmanDetEnv(MctsEnv):
         Args:
             states: A list of actions to get to the states.
         """
+        self.reset()  # OPTIMIZE ? ALSO STILL RUNNING INTO GHOSTS
         if self.use_clone_state:
             self.env.unwrapped.restore_full_state(states)
             self._states = states
         else:
-            self.reset()
             for action in states:
                 self.step(action)
 
