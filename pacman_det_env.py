@@ -11,17 +11,17 @@ from gym.envs.registration import register
 class PacmanDetEnv(MctsEnv):
 
     def __init__(self, screen_images=False, 
-        use_clone_state=True):
+        use_clone_state=True,
+        monitor_dir='pacman_results'):
         self.use_clone_state = use_clone_state
         if screen_images:
             # This is using screen images (may be better for muzero).
             self.env = gym.make("MsPacmanDeterministic-v0")
         else:
             # Deterministic using RAM as input (more efficient) for pure MCTS.
-            # self.env = gym.make("MsPacman-ramDeterministic-v0")
+            self.env = gym.make("MsPacman-ramDeterministic-v0")
             # TODO(timkim): undo to deeterministic later
-            self.env = gym.make("MsPacman-v0") # CRAHSES FOR SOME REASON
-
+            # self.env = gym.make("MsPacman-v0") # CRAHSES FOR SOME REASON
         self.env.reset()
 
         seed = 1234
@@ -41,6 +41,9 @@ class PacmanDetEnv(MctsEnv):
         nA = self.env.action_space.n
         print("Created PacMan ENV with nA: %s\nAction Meanings: %s" % (
             nA, self.env.get_action_meanings()))
+
+        if monitor_dir:
+            gym.wrappers.Monitor(self.env, monitor_dir, force=True)
 
         super(PacmanDetEnv, self).__init__(action_space=range(nA))
 
