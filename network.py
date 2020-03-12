@@ -2,7 +2,6 @@ import typing
 
 from network_initializer import NetworkInitializer
 
-#This is just a placeholder
 class Action(object):
     """ Class that represent an action of a game."""
 
@@ -51,7 +50,7 @@ class Network(object):
         # dynamics + prediction function
         #Need to encode action information with hidden state before passing
         #to the dynamics function.
-        encoded_state = self.dynamics_encoder(hidden_state, action)
+        encoded_state = self.dynamics_encoder.encode(hidden_state, action)
         hidden_state, reward = self.dynamics_network(encoded_state)
         policy_logits, value = self.prediction_network(hidden_state)
         return NetworkOutput(value, reward, policy_logits, hidden_state)

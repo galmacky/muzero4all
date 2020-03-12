@@ -138,3 +138,4 @@ dmypy.json
 
 # IntelliJ / PyCharm
 .idea/
+pseudocode.py
