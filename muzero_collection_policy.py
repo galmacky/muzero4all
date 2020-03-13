@@ -6,6 +6,7 @@ from mcts_core import MctsCore
 from muzero_mcts_model import MuZeroMctsModel
 from policy import Policy
 from network import Network
+from trajectory import Trajectory
 
 
 class MuZeroCollectionPolicy(Policy):
@@ -48,16 +49,16 @@ class MuZeroCollectionPolicy(Policy):
         return self.choose_action(self.get_policy_logits())
 
     def run_self_play(self, num_times):
+        trajectory = Trajectory()
         for _ in range(num_times):
             p = self.get_policy_logits()
             v = self.get_value()
             best_action = self.choose_action(p)
             states, is_final, reward = self.env.step(best_action)
-            self.feed_replay_buffer(p, v, best_action, reward)
+            trajectory.feed(best_action, reward, p, v)
+        self.feed_replay_buffer(trajectory)
 
-    def feed_replay_buffer(self, p, v, best_action, reward):
+    def feed_replay_buffer(self, trajectory):
         # TODO: implement this
         pass
-
-
 

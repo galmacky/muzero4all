@@ -75,6 +75,7 @@ class MuZeroCollectionPolicyTicTacToeTest(unittest.TestCase):
             states, is_final, reward = states_isfinal_reward
             if is_final:
                 return states, is_final, reward
+        # TODO: add a test around replay buffer.
 
     # def test_game_random(self):
     #     reward_dict = collections.defaultdict(int)
