@@ -83,7 +83,7 @@ class RepresentationNetwork(tf.keras.Model):
 
 class DynamicsEncoder(object):
     def encode(self, hidden_state, action):
-        encoded_actions = tf.one_hot(action.index, TicTacToeConfig.action_size, dtype=tf.int32)
+        encoded_actions = tf.one_hot(action.index, TicTacToeConfig.action_size)
         encoded_actions = tf.expand_dims(encoded_actions, 0)
         encoded_hidden_state= tf.concat([hidden_state, encoded_actions], axis=0) 
         encoded_hidden_state = np.expand_dims(encoded_hidden_state, 0)
