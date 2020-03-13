@@ -55,7 +55,7 @@ class MuZeroCollectionPolicy(Policy):
             p = self.get_policy_logits()
             v = self.get_value()
             best_action = self.choose_action(p)
-            game_state = self.env.get_current_game_input()
+            game_state = self.env.get_current_game_input()  # Use game state before taking the action.
             states, is_final, reward = self.env.step(best_action)
             trajectory.feed(best_action, reward, p, v,
                 game_state
