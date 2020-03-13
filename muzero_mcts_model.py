@@ -20,8 +20,8 @@ class MuZeroMctsModel(MctsModel):
         self.network = network
 
     def get_initial_states(self):
-        # TODO: generalize this
-        game_state = np.array(self.env.get_states()).reshape(-1, TicTacToeConfig.action_size)
+        # Reshape the states to be -1 x n dimension.
+        game_state = np.array(self.env.get_states()).reshape(-1, len(self.env.get_states()))
         # Note: we only use the initial hidden states. Other information will be used in a subsequent 'step' method.
         output = self.network.initial_inference(game_state)
         return output.hidden_state
