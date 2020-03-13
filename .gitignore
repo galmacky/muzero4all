@@ -139,3 +139,5 @@ dmypy.json
 # IntelliJ / PyCharm
 .idea/
 pseudocode.py
+
+pacman_results/
