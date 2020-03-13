@@ -8,6 +8,10 @@ from basic_mcts_model import BasicMctsModel
 from mcts_policy import MctsPolicy
 from pacman_det_env import PacmanDetEnv
 from gym.envs.atari import atari_env
+from network_initializer import TicTacToeInitializer, AtariInitializer
+from network import Network
+from muzero_collection_policy import MuZeroCollectionPolicy
+from muzero_eval_policy import ReplayBuffer, MuZeroEvalPolicy
 
 TRAIN_ITERATIONS = 5
 
@@ -21,7 +25,7 @@ tic_tac_toe_initializer = TicTacToeInitializer()
 
 env = PacmanDetEnv()
 network = Network(tic_tac_toe_initializer)
-rep_buf = ReplayBuffer()
+replay_buffer = ReplayBuffer()
 col_policy = MuZeroCollectionPolicy(env, network, replay_buffer)
 eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
 

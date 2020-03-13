@@ -8,11 +8,12 @@ from mcts_core import MctsCore
 from muzero_mcts_model import MuZeroMctsModel
 from policy import Policy
 from network import Network
+from trajectory import Trajectory
 
 
 class ReplayBuffer(object):
 
-  def __init__(self, config: MuZeroConfig):
+  def __init__(self):
     self.window_size = 1e6  # TODO: TUNE SMALLER ? 
     self.batch_size = 2048  # TODO: TUNE SMALLER ?
     self.buffer = []  # Holds trajectories
@@ -29,7 +30,7 @@ class ReplayBuffer(object):
              g.make_target(i, num_unroll_steps, td_steps))
             for (g, i) in game_pos]
 
-  def sample_game(self) -> Game:
+  def sample_game(self) -> Trajectory:
     # Sample game from buffer either uniformly or according to some priority.
     # We do in randomly in MuZero4All.
     return random.choice(self.buffer)
@@ -45,7 +46,7 @@ class MuZeroEvalPolicy(Policy):
     real eval action to take."""
 
     def __init__(self, env, network, replay_buffer):
-        self.env
+        self.env = env
         # As this implementation is single-threaded, no SharedStorage
         # is needed, instead we only keep track of a single network.
 
@@ -141,5 +142,5 @@ class MuZeroEvalPolicy(Policy):
             self.network.initial_inference(current_state))
         return policy_logits
 
-    def action(self, state):
+    def action(self):
         return tf.math.argmax(self.get_policy_logits())
