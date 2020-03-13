@@ -20,9 +20,18 @@ class MuZeroMctsModelTest(unittest.TestCase):
         self.model = MuZeroMctsModel(self.env, self.network)
 
     def test_basic(self):
-        pass
-        #self.assertEqual(tf.constant([0] * 9), self.model.get_initial_states())
-        #self.assertEqual([], self.model.step([0] * 9, 1))
+        hidden_state = self.model.get_initial_states()
+        tf.assert_equal(tf.constant(tf.zeros((1, 64))), hidden_state)
+        model_step = self.model.step(hidden_state, Action(1))
+        # Not trained, so returning an empty states.
+        tf.assert_equal(tf.constant(tf.zeros((1, 64))), model_step[0])  # states
+        self.assertFalse(model_step[1])  # is_final
+        self.assertEqual(0.0, model_step[2])
+        # Note: Policy logits are all empty. This could be problematic since it affects initial
+        # exploration.
+        tf.assert_equal(tf.constant(tf.zeros((1, 9))), model_step[3])  # policy
+        # TODO: this should be a single value?
+        tf.assert_equal(tf.constant(tf.zeros((1, 21))), model_step[4])  # value
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import typing
 
 from network_initializer import NetworkInitializer
 
+
 class Action(object):
     """ Class that represent an action of a game."""
 
