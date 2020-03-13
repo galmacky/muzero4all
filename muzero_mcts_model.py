@@ -1,12 +1,10 @@
 
 import numpy as np
-import tensorflow as tf
 
 from env import Env
 from mcts_model import MctsModel
 from network import Action
 from network import Network
-from tic_tac_toe_config import TicTacToeConfig
 
 
 class MuZeroMctsModel(MctsModel):
@@ -20,7 +18,7 @@ class MuZeroMctsModel(MctsModel):
         self.network = network
 
     def get_initial_states(self):
-        # Reshape the states to be -1 x n dimension.
+        # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
         game_state = np.array(self.env.get_states()).reshape(-1, len(self.env.get_states()))
         # Note: we only use the initial hidden states. Other information will be used in a subsequent 'step' method.
         output = self.network.initial_inference(game_state)
