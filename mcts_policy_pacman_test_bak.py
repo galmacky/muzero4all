@@ -15,9 +15,9 @@ class MctsPolicyFrozenLakeTest(unittest.TestCase):
     # 10, 10 pretty fast, ~.1s per step, 1.0 discount achieves ~2200 score.
     def setUp(self):
         self.env = PacmanDetEnv()
-        self.model = BasicMctsModel(self.env, discount=.9, max_depth=10)
+        self.model = BasicMctsModel(self.env, discount=.9, max_depth=50)
         self.policy = MctsPolicy(self.env, self.model,
-                                 num_simulations=10, discount=.9)
+                                 num_simulations=50, discount=.9)
 
     # def test_second_to_final(self):
     #     # Move to the left and up of Goal state.

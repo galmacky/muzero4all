@@ -1,10 +1,13 @@
 
+from env import Env
 from mcts_model import MctsModel
+from network import Network
 
 
 class MuZeroMctsModel(MctsModel):
+    """MCTS model for MuZero algorithm."""
 
-    def __init__(self, env, network):
+    def __init__(self, env: Env, network: Network):
         self.env = env
         self.network = network
 
@@ -12,16 +15,15 @@ class MuZeroMctsModel(MctsModel):
         self.network = network
 
     def get_initial_states(self):
-        # TODO
-        return [0] * 9
-        return self.network.initial_inference(self.env.get_states())
+        # Note: we only use the initial hidden states. Other information will be used in a subsequent 'step' method.
+        output = self.network.initial_inference(self.env.get_states())
+        return output.hidden_state
 
     def reset(self):
         # This is called when we call policy.reset()
         self.network.reset()
-        pass
 
-    def step(self, states, action):
-        return [0] * 9, False, 0.0, {i: 1.0 for i in range(0, 9)}, 0.1
-        # TODO: return (new_states, is_final, immediate_reward, policy_prior_dict, predicted_value_for_new_states)
-        return self.network.virtual_step(states)
+    def step(self, parent_states, action):
+        output = self.network.recurrent_inference(parent_states, action)
+        # Note: we do not have is_final value. This can cause a serious error.
+        return output.hidden_state, False, output.reward, output.policy_logits, output.value
