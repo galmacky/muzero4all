@@ -12,12 +12,15 @@ class Trajectory(object):
         self.child_visits = []
         self.root_values = []
         self.discount = discount
+        self.game_states = []
 
-    def feed(self, action, reward, child_visit_dist, root_value):
+    def feed(self, action, reward, child_visit_dist, root_value,
+             game_state):
         self.action_history.append(action)
         self.rewards.append(reward)
         self.child_visits.append(child_visit_dist)
         self.root_values.append(root_value)
+        self.game_states.append(game_state)
 
     def make_target(self, state_index: int, num_unroll_steps: int, td_steps: int):
         # The value target is the discounted root value of the search tree N steps
@@ -47,3 +50,6 @@ class Trajectory(object):
                 # States past the end of games are treated as absorbing states.
                 targets.append((0, last_reward, []))
         return targets
+
+    def make_image(self, state_index: int):
+        return self.game_states[state_index]

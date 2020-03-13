@@ -6,18 +6,14 @@ from mcts_core import MctsCore
 from muzero_mcts_model import MuZeroMctsModel
 from policy import Policy
 from network import Network
-from trajectory import Trajectory
 
-
-class MuZeroCollectionPolicy(Policy):
+class MuZeroPolicy(Policy):
     """Policy for MuZero."""
 
-    def __init__(self, env, network, replay_buffer=None, num_simulations=100, discount=1.,
+    def __init__(self, env, network_initializer, num_simulations=100, discount=1.,
                  rng: np.random.RandomState = np.random.RandomState()):
-        self.network = network
-        self.replay_buffer = replay_buffer
+        self.network = Network(network_initializer)
         self.model = MuZeroMctsModel(env, self.network)
-        self.discount = discount
         # env is used only for the action space.
         self.core = MctsCore(env, self.model, discount=discount)
         self.num_simulations = num_simulations
@@ -48,20 +44,3 @@ class MuZeroCollectionPolicy(Policy):
 
     def action(self):
         return self.choose_action(self.get_policy_logits())
-
-    def run_self_play(self, num_times):
-        trajectory = Trajectory(discount=self.discount)
-        for _ in range(num_times):
-            p = self.get_policy_logits()
-            v = self.get_value()
-            best_action = self.choose_action(p)
-            game_state = self.env.get_current_game_input()
-            states, is_final, reward = self.env.step(best_action)
-            trajectory.feed(best_action, reward, p, v,
-                game_state
-                )
-        self.feed_replay_buffer(trajectory)
-
-    def feed_replay_buffer(self, trajectory):
-        # TODO: implement this
-        self.replay_buffer.save_game(trajectory)
