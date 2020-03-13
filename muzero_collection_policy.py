@@ -7,12 +7,13 @@ from muzero_mcts_model import MuZeroMctsModel
 from policy import Policy
 from network import Network
 
+
 class MuZeroCollectionPolicy(Policy):
     """Policy for MuZero."""
 
-    def __init__(self, env, network_initializer, num_simulations=100, discount=1.,
+    def __init__(self, env, network, num_simulations=100, discount=1.,
                  rng: np.random.RandomState = np.random.RandomState()):
-        self.network = Network(network_initializer)
+        self.network = network
         self.model = MuZeroMctsModel(env, self.network)
         # env is used only for the action space.
         self.core = MctsCore(env, self.model, discount=discount)
