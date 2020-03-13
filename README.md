@@ -5,10 +5,12 @@ This is our MuZero implementation for [Stanford CS234](https://cs234.stanford.ed
 
 Setup:
 
-    $ pip3 -m venv path/to/virtual
+    $ python3 -m venv path/to/virtual
     $ source path/to/virtual/bin/activate
     $ pip3 install -r requirements.txt
 
+Install pre-push hook once git repo is cloned:
+    $ cp .pre-push .git/hook/pre-push
 
 Main contributors:
 
