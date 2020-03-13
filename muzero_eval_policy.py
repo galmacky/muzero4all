@@ -1,4 +1,6 @@
 
+import random
+
 import numpy as np
 import tensorflow as tf
 
@@ -7,14 +9,42 @@ from muzero_mcts_model import MuZeroMctsModel
 from policy import Policy
 from network import Network
 
-class ReplayBuffer():
-    pass
+
+class ReplayBuffer(object):
+
+  def __init__(self, config: MuZeroConfig):
+    self.window_size = 1e6  # TODO: TUNE SMALLER ? 
+    self.batch_size = 2048  # TODO: TUNE SMALLER ?
+    self.buffer = []  # Holds trajectories
+
+  def save_game(self, game):
+    if len(self.buffer) > self.window_size:
+        self.buffer.pop(0)
+    self.buffer.append(game)
+
+  def sample_batch(self, num_unroll_steps: int, td_steps: int):
+    games = [self.sample_game() for _ in range(self.batch_size)]
+    game_pos = [(g, self.sample_position(g)) for g in games]
+    return [(g.make_image(i), g.action_history[i:i + num_unroll_steps],
+             g.make_target(i, num_unroll_steps, td_steps))
+            for (g, i) in game_pos]
+
+  def sample_game(self) -> Game:
+    # Sample game from buffer either uniformly or according to some priority.
+    # We do in randomly in MuZero4All.
+    return random.choice(self.buffer)
+
+  def sample_position(self, game) -> int:
+    # Sample position from game either uniformly or according to some priority.
+    # We do in randomly in MuZero4All.
+    return random.choice(range(len(self.game_states)))
+
 
 class MuZeroEvalPolicy(Policy):
     """Eval Policy for MuZero. Used for training and getting the 
     real eval action to take."""
 
-    def __init__(self, env, network):
+    def __init__(self, env, network, replay_buffer):
         self.env
         # As this implementation is single-threaded, no SharedStorage
         # is needed, instead we only keep track of a single network.
@@ -25,9 +55,10 @@ class MuZeroEvalPolicy(Policy):
         # self.network_initializer = network_initializer
 
         self.network = network
-
+        self.replay_buffer = replay_buffer
         # TODO(timkim): FIND VALUES
         # AdamOptimizer
+        # TODO: TUNE 
         self.lr = 3e-2
         self.weight_decay = 1e-4
 
@@ -60,10 +91,14 @@ class MuZeroEvalPolicy(Policy):
     #     action = tf.math.argmax(logits)
     #     return action
 
-    def train(self, num_steps):
+    # IMPORTANT!!!!!!: num_unroll_steps needs to match the size of the rollouts in
+    # MCTS +changwan@
+    def train(self, num_steps, num_unroll_steps):
         self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lr)
         for i in range(num_steps):
-            batch = #################
+            batch = self.replay_buffer.sample_batch(
+                num_unroll_steps, td_steps=10  #TODO: TUNE td_steps
+                )
             self.update_weights(optimizer, batch)
 
     def update_weights(self, batch):
@@ -101,7 +136,7 @@ class MuZeroEvalPolicy(Policy):
         optimizer.minimize(loss)
 
     def get_policy_logits(self):
-        current_state = env.get_current_game_input()
+        current_state = self.env.get_current_game_input()
         policy_logits, value = self.network.prediction_network(
             self.network.initial_inference(current_state))
         return policy_logits
