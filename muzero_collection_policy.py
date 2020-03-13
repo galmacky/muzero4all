@@ -7,7 +7,7 @@ from muzero_mcts_model import MuZeroMctsModel
 from policy import Policy
 from network import Network
 
-class MuZeroPolicy(Policy):
+class MuZeroCollectionPolicy(Policy):
     """Policy for MuZero."""
 
     def __init__(self, env, network_initializer, num_simulations=100, discount=1.,
