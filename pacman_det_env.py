@@ -100,3 +100,6 @@ class PacmanDetEnv(MctsEnv):
             new_states = self._states
 
         return new_states, done, rew
+
+    def get_current_game_input(self):
+        return self.env.render('rgb_array')
