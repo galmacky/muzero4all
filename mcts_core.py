@@ -136,5 +136,8 @@ class MctsCore(object):
 
         return policy
 
+    def get_value(self):
+        return self._root.value()
+
     def get_root_for_testing(self):
         return self._root

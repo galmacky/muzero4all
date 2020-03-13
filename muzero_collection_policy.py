@@ -11,9 +11,10 @@ from network import Network
 class MuZeroCollectionPolicy(Policy):
     """Policy for MuZero."""
 
-    def __init__(self, env, network, num_simulations=100, discount=1.,
+    def __init__(self, env, network, replay_buffer=None, num_simulations=100, discount=1.,
                  rng: np.random.RandomState = np.random.RandomState()):
         self.network = network
+        self.replay_buffer = replay_buffer
         self.model = MuZeroMctsModel(env, self.network)
         # env is used only for the action space.
         self.core = MctsCore(env, self.model, discount=discount)
@@ -45,3 +46,18 @@ class MuZeroCollectionPolicy(Policy):
 
     def action(self):
         return self.choose_action(self.get_policy_logits())
+
+    def run_self_play(self, num_times):
+        for _ in range(num_times):
+            p = self.get_policy_logits()
+            v = self.get_value()
+            best_action = self.choose_action(p)
+            states, is_final, reward = self.env.step(best_action)
+            self.feed_replay_buffer(p, v, best_action, reward)
+
+    def feed_replay_buffer(self, p, v, best_action, reward):
+        # TODO: implement this
+        pass
+
+
+

@@ -18,8 +18,9 @@ class MuZeroCollectionPolicyTicTacToeTest(unittest.TestCase):
         self.env = TicTacToeEnv(use_random=use_random, r_seed=r_seed)
         self.network_initializer = TicTacToeInitializer()
         self.network = Network(self.network_initializer)
+        self.replay_buffer = None
         self.rng = np.random.RandomState(0)
-        self.policy = MuZeroCollectionPolicy(self.env, self.network,
+        self.policy = MuZeroCollectionPolicy(self.env, self.network, self.replay_buffer,
                                              num_simulations=100, discount=1., rng=self.rng)
 
     def test_action_start(self):
