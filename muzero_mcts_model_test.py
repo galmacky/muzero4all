@@ -30,7 +30,8 @@ class MuZeroMctsModelTest(unittest.TestCase):
         # Note: Policy logits are all empty. This could be problematic since it affects initial
         # exploration.
         tf.assert_equal(tf.constant(tf.zeros((1, 9))), model_step[3])  # policy
-        self.assertEqual(0.0, model_step[3][0][0])
+        # MuZeroMctsModel internally removes the outer dimension of policy prior.
+        self.assertEqual(0.0, model_step[3][0])
         # TODO: this should be a single value?
         tf.assert_equal(tf.constant(tf.zeros((1, 21))), model_step[4])  # value
 

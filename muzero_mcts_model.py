@@ -1,5 +1,6 @@
 
 import numpy as np
+import tensorflow as tf
 
 from env import Env
 from mcts_model import MctsModel
@@ -31,4 +32,5 @@ class MuZeroMctsModel(MctsModel):
     def step(self, parent_states, action):
         output = self.network.recurrent_inference(parent_states, Action(action))
         # Note: we do not have is_final value. This can cause a serious error.
-        return output.hidden_state, False, output.reward, output.policy_logits, output.value
+        policy_logits = tf.reshape(output.policy_logits, [len(self.env.action_space)])
+        return output.hidden_state, False, output.reward, policy_logits, output.value
