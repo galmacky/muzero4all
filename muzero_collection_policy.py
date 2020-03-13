@@ -16,6 +16,7 @@ class MuZeroCollectionPolicy(Policy):
                  rng: np.random.RandomState = np.random.RandomState()):
         self.network = network
         self.replay_buffer = replay_buffer
+        self.env = env
         self.model = MuZeroMctsModel(env, self.network)
         self.discount = discount
         # env is used only for the action space.
@@ -53,7 +54,7 @@ class MuZeroCollectionPolicy(Policy):
         trajectory = Trajectory(discount=self.discount)
         for _ in range(num_times):
             p = self.get_policy_logits()
-            v = self.get_value()
+            v = self.core.get_value()
             best_action = self.choose_action(p)
             game_state = self.env.get_current_game_input()  # Use game state before taking the action.
             states, is_final, reward = self.env.step(best_action)
