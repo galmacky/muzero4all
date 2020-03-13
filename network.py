@@ -54,6 +54,8 @@ class Network(object):
         encoded_state = self.dynamics_encoder.encode(hidden_state, action)
         hidden_state, reward = self.dynamics_network(encoded_state)
         policy_logits, value = self.prediction_network(hidden_state)
+        #Enable this when value/reward are discrete support sets.
+        # value = _decode_support_set(value)
         return NetworkOutput(value, reward, policy_logits, hidden_state)
 
     def get_weights(self):
@@ -63,3 +65,33 @@ class Network(object):
     def training_steps(self) -> int:
         # How many steps / batches the network has been trained for.
         return self.training_steps
+
+    #Private
+    def _decode_support_set(self, logits):
+        """
+        Converts discrete set of size support*2 + 1 to a scalar.
+        This is used for value and reward.
+        """
+        value = tf.nn.softmax(logits)
+        value = np.dot(value, range(self.value_support_size))
+        value = self._inverse_invertible_transform(value)
+        return value
+
+    def _encode_support_set(self, logits):
+        """
+        Converts a scalar to a discrete set of size support*2 + 1.
+        This is used for value and reward.
+        """
+        pass
+
+    # From the MuZero paper.
+    def _invertible_transform(x, eps=0.001):
+        return tf.math.sign(x) * (tf.math.sqrt(tf.math.abs(x) + 1.) - 1.) + eps * x
+
+    #Private
+    # From the MuZero paper.
+    def _inverse_invertible_transform(x, eps=0.001):
+        return tf.math.sign(x) * (
+            tf.math.square(
+                (tf.sqrt(4 * eps *
+                        (tf.math.abs(x) + 1. + eps) + 1.) - 1.) / (2. * eps)) - 1.)

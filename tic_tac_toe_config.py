@@ -11,6 +11,8 @@ class TicTacToeConfig():
     action_size = 9
     representation_size   = 9
     hidden_size       = 64
+    reward_size = 1
+    value_size = 1
     # log_freq          = 50
     # eval_freq         = 3000
     # soft_epsilon      = 0

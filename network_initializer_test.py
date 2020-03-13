@@ -17,7 +17,8 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
     def test_prediction_network(self):
         input_image = np.array(self.env.get_states()).reshape(-1, TicTacToeConfig.action_size)
         policy_logits, value = self.prediction_network(input_image)
-        self.assertTrue(value.shape == (1, 2*TicTacToeConfig.support_size + 1))
+        # self.assertTrue(value.shape == (1, 2*TicTacToeConfig.support_size + 1))
+        self.assertTrue(value.shape == (1, TicTacToeConfig.value_size))
         self.assertTrue(policy_logits.shape == (1, TicTacToeConfig.action_size))
        
     def test_representation_network(self):

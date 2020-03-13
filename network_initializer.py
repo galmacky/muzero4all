@@ -38,7 +38,8 @@ class PredictionNetwork(tf.keras.Model):
         
         self.value_network = models.Sequential()
         self.value_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
-        self.value_network.add(layers.Dense(TicTacToeConfig.support_size *2 + 1, activation='relu'))
+        # self.value_network.add(layers.Dense(TicTacToeConfig.support_size *2 + 1, activation='relu'))
+        self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation='relu'))
 
     def call(self, inputs):
         policy_logits = self.policy_network(inputs)
@@ -61,7 +62,7 @@ class DynamicsNetwork(tf.keras.Model):
         
         self.reward_network = models.Sequential()
         self.reward_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-        self.reward_network.add(layers.Dense(1, activation='relu'))
+        self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation='relu'))
     '''
     Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
     '''

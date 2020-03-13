@@ -19,7 +19,8 @@ class NetworkTest(unittest.TestCase):
         game_state = np.array(self.env.get_states()).reshape(-1, TicTacToeConfig.action_size)
         output = self.network.initial_inference(game_state)
         self.assertTrue(output.reward == 0)
-        self.assertTrue(output.value.shape == (1, 2*TicTacToeConfig.support_size + 1))
+        # self.assertTrue(output.value.shape == (1, 2*TicTacToeConfig.support_size + 1))
+        self.assertTrue(output.value.shape == (1, TicTacToeConfig.value_size))
         self.assertTrue(output.policy_logits.shape == (1, TicTacToeConfig.action_size))
         self.assertTrue(output.hidden_state.shape == (1, TicTacToeConfig.hidden_size))
 
@@ -28,7 +29,8 @@ class NetworkTest(unittest.TestCase):
         action = Action(0)
         output = self.network.recurrent_inference(game_state, action)
         self.assertTrue(output.reward == 0)
-        self.assertTrue(output.value.shape == (1, 2*TicTacToeConfig.support_size + 1))
+        # self.assertTrue(output.value.shape == (1, 2*TicTacToeConfig.support_size + 1))
+        self.assertTrue(output.value.shape == (1, TicTacToeConfig.value_size))
         self.assertTrue(output.policy_logits.shape == (1, TicTacToeConfig.action_size))
         self.assertTrue(output.hidden_state.shape == (1, TicTacToeConfig.hidden_size))
        
