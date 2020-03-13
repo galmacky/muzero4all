@@ -17,6 +17,7 @@ class MuZeroCollectionPolicy(Policy):
         self.network = network
         self.replay_buffer = replay_buffer
         self.model = MuZeroMctsModel(env, self.network)
+        self.discount = discount
         # env is used only for the action space.
         self.core = MctsCore(env, self.model, discount=discount)
         self.num_simulations = num_simulations
@@ -49,7 +50,7 @@ class MuZeroCollectionPolicy(Policy):
         return self.choose_action(self.get_policy_logits())
 
     def run_self_play(self, num_times):
-        trajectory = Trajectory()
+        trajectory = Trajectory(discount=self.discount)
         for _ in range(num_times):
             p = self.get_policy_logits()
             v = self.get_value()
@@ -61,4 +62,3 @@ class MuZeroCollectionPolicy(Policy):
     def feed_replay_buffer(self, trajectory):
         # TODO: implement this
         pass
-
