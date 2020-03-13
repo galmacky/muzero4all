@@ -2,19 +2,25 @@ import collections
 import unittest
 
 import tensorflow as tf
+import numpy as np
 
-from muzero_policy import MuZeroPolicy
-from tic_tac_toe_env import TicTacToeEnv
+from muzero_collection_policy import MuZeroCollectionPolicy
+from network import Network
 from network_initializer import TicTacToeInitializer
+from tic_tac_toe_env import TicTacToeEnv
 
-class MuZeroPolicyTicTacToeTest(unittest.TestCase):
+
+class MuZeroCollectionPolicyTicTacToeTest(unittest.TestCase):
     def setUp(self):
         self.initialize(False, 0)
 
     def initialize(self, use_random, r_seed):
         self.env = TicTacToeEnv(use_random=use_random, r_seed=r_seed)
         self.network_initializer = TicTacToeInitializer()
-        self.policy = MuZeroPolicy(self.env, self.network_initializer, num_simulations=100)
+        self.network = Network(self.network_initializer)
+        self.rng = np.random.RandomState(0)
+        self.policy = MuZeroCollectionPolicy(self.env, self.network,
+                                             num_simulations=100, discount=1., rng=self.rng)
 
     def test_action_start(self):
         action = self.policy.action()
