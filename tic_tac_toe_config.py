@@ -9,8 +9,9 @@ class TicTacToeConfig():
     # model and training config
     support_size = 10
     action_size = 9
-    representation_size   = 9
-    hidden_size       = 64
+    representation_size   = 18
+    hidden_size       = 9
+    #These two are defined since value/reward are technically of 2*support_size + 1
     reward_size = 1
     value_size = 1
     # log_freq          = 50
