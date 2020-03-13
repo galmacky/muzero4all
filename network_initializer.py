@@ -17,13 +17,6 @@ class NetworkInitializer(object):
     def initialize(self):
         pass
 
-class Encoder(object):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def encode(self, hidden_state, action):
-        pass
-
 class PredictionNetwork(tf.keras.Model):
     '''
     Creates a network that returns the policy logits and the value
@@ -63,6 +56,7 @@ class DynamicsNetwork(tf.keras.Model):
         self.reward_network = models.Sequential()
         self.reward_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
         self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation='relu'))
+    
     '''
     Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
     '''
@@ -87,18 +81,22 @@ class RepresentationNetwork(tf.keras.Model):
         hidden_state = self.representation_network(inputs)
         return hidden_state
 
-class DynamicsEncoder(Encoder):
+class DynamicsEncoder(object):
     def encode(self, hidden_state, action):
-        # encoded_actions = [tf.one_hot(action.index, TicTacToeConfig.action_size, dtype=tf.int32)]
-        # print(encoded_actions)
-        # # print(tf.one_hot(action.index, 1).shape)
-        # print(hidden_state)
-        # encoded = tf.concat(hidden_state, encoded_actions) 
-        # # concat = tf.concat(hidden_state, tf.one_hot(action.index, TicTacToeConfig.action_size))
-        # print(encoded)
-        #TODO(FJUR): Figure out how to encode each action and state per batch?
-        return hidden_state
-        # return tf.concat(hidden_state, tf.one_hot(action.index, TicTacToeConfig.action_size))
+        encoded_actions = tf.one_hot(action.index, TicTacToeConfig.action_size, dtype=tf.int32)
+        encoded_actions = tf.expand_dims(encoded_actions, 0)
+        encoded_hidden_state= tf.concat([hidden_state, encoded_actions], axis=0) 
+        encoded_hidden_state = np.expand_dims(encoded_hidden_state, 0)
+        #Tic Tac Toe uses dense layer so flatten.
+        encoded_hidden_state = tf.expand_dims(tf.reshape(encoded_hidden_state, [-1]), 0)
+        return encoded_hidden_state
+
+class RepresentationEncoder(object):
+    def encode(self, hidden_state, action):
+        action_plane = tf.one_hot(actions_batch, TicTacToeConfig.action_size)
+        # Recurrent step from conditioned representation: recurrent + prediction networks
+        representation_stack = tf.concat((representation_batch, action_plane), axis=1)
+        return representation_stack
 
 '''
     Builds the dynamics, representation, and prediction
@@ -111,7 +109,8 @@ class TicTacToeInitializer(NetworkInitializer):
         dynamics_network = DynamicsNetwork()
         representation_network = RepresentationNetwork()
         dynamics_encoder = DynamicsEncoder()
-        return (prediction_network, dynamics_network, representation_network, dynamics_encoder)
+        representation_encoder = RepresentationEncoder()
+        return (prediction_network, dynamics_network, representation_network, dynamics_encoder, representation_encoder)
 
 '''
     Builds the dynamics, representation, and prediction

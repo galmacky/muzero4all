@@ -12,7 +12,7 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
     def setUp(self):
         self.env = TicTacToeEnv()
         self.network_initializer = TicTacToeInitializer()
-        self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder = self.network_initializer.initialize()
+        self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.representation_encoder = self.network_initializer.initialize()
 
     def test_prediction_network(self):
         input_image = np.array(self.env.get_states()).reshape(-1, TicTacToeConfig.action_size)
@@ -40,10 +40,11 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
         self.assertTrue(hidden_state.shape == (1, TicTacToeConfig.hidden_size))
 
     def test_encoded_dynamics_state(self):
-        hidden_state = np.zeros((TicTacToeConfig.batch_size, TicTacToeConfig.hidden_size))
+        # hidden_state = np.zeros((TicTacToeConfig.batch_size, TicTacToeConfig.hidden_size))
+        hidden_state = np.zeros(TicTacToeConfig.hidden_size)
         action = Action(0)
         hidden_state = np.zeros((TicTacToeConfig.batch_size, TicTacToeConfig.hidden_size))
         encoded_state = self.dynamics_encoder.encode(hidden_state, action)
         #TODO(FJUR): This should encode 2 planes, a 1 hot plane with the selected action,
         # and a binary plane whether the move was valid or not (all 0's or 1's)
-        pass
+        self.assertTrue(encoded_state.shape == (1, TicTacToeConfig.representation_size))

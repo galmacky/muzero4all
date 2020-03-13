@@ -34,11 +34,7 @@ class NetworkOutput(typing.NamedTuple):
 class Network(object):
 
     def __init__(self, initializer: NetworkInitializer):
-        prediction_network, dynamics_network, representation_network, dynamics_encoder = initializer.initialize()
-        self.representation_network = representation_network
-        self.dynamics_network = dynamics_network
-        self.prediction_network = prediction_network
-        self.dynamics_encoder = dynamics_encoder
+        self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.represetnation_encoder = initializer.initialize()
         self.training_steps = 0
 
     def initial_inference(self, image) -> NetworkOutput:
