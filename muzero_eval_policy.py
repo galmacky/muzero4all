@@ -108,6 +108,11 @@ class MuZeroEvalPolicy(Policy):
                 loss += self.scale_gradient(l, gradient_scale)
 
         for weights in self.network.get_weights():
+            # print("weights")
+            # print("weights")
+            # print("weights")
+            # print(weights)
+            # print(weights.shape)
             loss += self.weight_decay * tf.nn.l2_loss(weights)
   
         self.optimizer.minimize(loss)

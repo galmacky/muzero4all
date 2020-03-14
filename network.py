@@ -1,7 +1,7 @@
 import typing
 
 from network_initializer import NetworkInitializer
-
+import numpy as np
 
 class Action(object):
     """ Class that represent an action of a game."""
@@ -56,8 +56,18 @@ class Network(object):
 
     def get_weights(self):
         # Returns the weights of this network.
-        return [self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights()]
+        # return np.concatenate(self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights())
+        # return np.concatenate([self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights()]).ravel()
+        weights = []
+        for weight in self.representation_network.get_weights():
+            weights.append(weights)
+        for weight in self.dynamics_network.get_weights():
+            weights.append(weights)
+        for weight in self.prediction_network.get_weights():
+            weights.append(weights)
 
+        return weights
+    
     def training_steps(self) -> int:
         # How many steps / batches the network has been trained for.
         return self.training_steps
