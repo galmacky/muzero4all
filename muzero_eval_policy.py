@@ -74,43 +74,47 @@ class MuZeroEvalPolicy(Policy):
             # print('image', image)
             # print('actions', actions)
             # print('targets', targets)
-        for image, actions, targets in batch:
-            # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
-            image = np.array(self.env.get_states()).reshape(-1, len(image))
-            # Initial step, from the real observation.
-            value, reward, policy_logits, hidden_state = self.network.initial_inference(
-                image)
-            predictions = [(1.0, value, reward, policy_logits)]
+        with tf.GradientTape() as tape:
+            for image, actions, targets in batch:
+                # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
+                image = np.array(self.env.get_states()).reshape(-1, len(image))
+                # Initial step, from the real observation.
+                value, reward, policy_logits, hidden_state = self.network.initial_inference(
+                    image)
+                predictions = [(1.0, value, reward, policy_logits)]
 
-            # Recurrent steps, from action and previous hidden state.
-            for action in actions:
-                value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
-                    hidden_state, Action(action))
-                predictions.append((1.0 / len(actions), value, reward, policy_logits))
+                # Recurrent steps, from action and previous hidden state.
+                for action in actions:
+                    value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
+                        hidden_state, Action(action))
+                    predictions.append((1.0 / len(actions), value, reward, policy_logits))
 
-                hidden_state = self.scale_gradient(hidden_state, 0.5)
+                    hidden_state = self.scale_gradient(hidden_state, 0.5)
 
-            for prediction, target in zip(predictions, targets):
-                gradient_scale, value, reward, policy_logits = prediction
-              
-                target_value, target_reward, target_policy = target
-                # TODO: fix reward / target_reward to be float32.
-                l = (
-                    self.scalar_loss(value, target_value) +
-                    self.scalar_loss(reward, target_reward) +
-                    tf.nn.softmax_cross_entropy_with_logits(
-                        logits=policy_logits, labels=target_policy))
+                for prediction, target in zip(predictions, targets):
+                    gradient_scale, value, reward, policy_logits = prediction
+                
+                    target_value, target_reward, target_policy = target
+                    # TODO: fix reward / target_reward to be float32.
+                    l = (
+                        self.scalar_loss(value, target_value) +
+                        self.scalar_loss(reward, target_reward) +
+                        tf.nn.softmax_cross_entropy_with_logits(
+                            logits=policy_logits, labels=target_policy))
 
-                loss += self.scale_gradient(l, gradient_scale)
+                    loss += self.scale_gradient(l, gradient_scale)
 
-        for weights in self.network.get_weights():
-            loss += self.weight_decay * tf.nn.l2_loss(weights)
-        
-        get_all_trainable_weights = self.network.get_weights()
-        # get_all_trainable_weights = self.network.get_weights()
-        print("!!!!!!!!!!!")  ## DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        print(get_all_trainable_weights)
-        self.optimizer.minimize(lambda: loss, var_list=get_all_trainable_weights)
+            for weights in self.network.get_weights():
+                loss += self.weight_decay * tf.nn.l2_loss(weights)
+            
+        all_trainable_weights = self.network.get_weights()
+        # all_trainable_weights = self.network.get_weights()
+        # print("!!!!!!!!!!!")  ## DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # print(all_trainable_weights)
+        # self.optimizer.minimize(lambda: loss, var_list=all_trainable_weights)
+        print("PRAY FOR GRADIENTS")
+        gradients = tape.gradient(loss, all_trainable_weights)
+        self.optimizer.apply_gradients(zip(gradients, all_trainable_weights))
 
     def scalar_loss(self, y_true, y_pred):
         return tf.square(y_true - y_pred)
