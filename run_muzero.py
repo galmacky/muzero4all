@@ -11,7 +11,8 @@ from gym.envs.atari import atari_env
 from network_initializer import TicTacToeInitializer, AtariInitializer
 from network import Network
 from muzero_collection_policy import MuZeroCollectionPolicy
-from muzero_eval_policy import ReplayBuffer, MuZeroEvalPolicy
+from muzero_eval_policy import MuZeroEvalPolicy
+from replay_buffer import ReplayBuffer
 from tic_tac_toe_env import TicTacToeEnv
 
 
@@ -37,6 +38,7 @@ for train_iter in range(TRAIN_ITERATIONS):
         print('STARTING PLAY ITERATION #{}'.format(play_iter))
         start_time = time.time()
         col_policy.run_self_play()
+        print ('replay_buffer:', replay_buffer.buffer)
         end_time = time.time()
         print('Self Play Iteration Runtime: {}'.format(end_time - start_time))
     eval_policy.train(NUM_TRAIN_STEPS, NUM_UNROLL_STEPS)
