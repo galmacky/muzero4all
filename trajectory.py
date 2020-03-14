@@ -16,6 +16,8 @@ class Trajectory(object):
 
     def feed(self, action, reward, child_visit_dist, root_value,
              game_state):
+        # Each of these are the same size, per each state we've visited in the
+        # trajectory.
         self.action_history.append(action)
         self.rewards.append(reward)
         self.child_visits.append(child_visit_dist)
