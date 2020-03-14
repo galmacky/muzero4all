@@ -89,13 +89,14 @@ class MuZeroEvalPolicy(Policy):
                 gradient_scale, value, reward, policy_logits = prediction
                 target_value, target_reward, target_policy = target
 
+                # TODO: fix reward / target_reward to be float32.
                 l = (
                     self.scalar_loss(value, target_value) +
                     self.scalar_loss(reward, target_reward) +
                     tf.nn.softmax_cross_entropy_with_logits(
                         logits=policy_logits, labels=target_policy))
 
-                loss += tf.scale_gradient(l, gradient_scale)
+                loss += self.scale_gradient(l, gradient_scale)
 
         for weights in self.network.get_weights():
             loss += self.weight_decay * tf.nn.l2_loss(weights)
@@ -103,6 +104,7 @@ class MuZeroEvalPolicy(Policy):
         self.optimizer.minimize(loss)
 
     def scalar_loss(self, y_true, y_pred):
+        return tf.square(tf.cast(y_true, dtype=tf.float32) - tf.cast(y_pred, dtype=tf.float32))
         # TODO: check if this is correct
         return tf.keras.losses.MSE(y_true, y_pred)
 
