@@ -48,7 +48,8 @@ class Trajectory(object):
                 targets.append((value, last_reward, self.child_visits[current_index]))
             else:
                 # States past the end of games are treated as absorbing states.
-                targets.append((0, last_reward, []))
+                #TODO(fjur): Should the top level node be used?
+                targets.append((0., 0., self.child_visits[0]))
         return targets
 
     def make_image(self, state_index: int):
