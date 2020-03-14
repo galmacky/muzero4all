@@ -42,7 +42,6 @@ for train_iter in range(TRAIN_ITERATIONS):
         print('Self Play Iteration Runtime: {}'.format(end_time - start_time))
     eval_policy.train(NUM_TRAIN_STEPS, NUM_UNROLL_STEPS)
 
-
 idx = 0
 total_reward = 0
 while True:
@@ -56,7 +55,9 @@ while True:
         'TotalReward: %s\nCalc time: %s\n\n' 
         % (idx, action, reward, total_reward, 
             end_time - start_time))
-    env.env.render()
+    #Tic Tac Toe doesn't have an env inside it.
+    #TODO(Tim): Please fix tic tac toe env.
+    # env.env.render()
     if is_final:
         print("Hit is_final!")
         break
