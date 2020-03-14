@@ -62,13 +62,18 @@ class MuZeroEvalPolicy(Policy):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
         for i in range(num_steps):
             batch = self.replay_buffer.sample_batch(
-                num_unroll_steps, td_steps=10  #TODO: TUNE td_steps
+                num_unroll_steps, td_steps=2  #TODO: TUNE td_steps
                 )
             self.update_weights(batch)
 
     def update_weights(self, batch):
 
         loss = 0
+        # for image, actions, targets in batch:
+            # print("-----------------------------")
+            # print('image', image)
+            # print('actions', actions)
+            # print('targets', targets)
         for image, actions, targets in batch:
             # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
             image = np.array(self.env.get_states()).reshape(-1, len(image))
@@ -87,15 +92,20 @@ class MuZeroEvalPolicy(Policy):
 
             for prediction, target in zip(predictions, targets):
                 gradient_scale, value, reward, policy_logits = prediction
+              
                 target_value, target_reward, target_policy = target
-
+                # print("target_value", target_value)
+                # print("target_reward", target_reward)
+                # print("target_policy", target_policy)
+                # print("target_policy", target_policy.shape)
+                # TODO: fix reward / target_reward to be float32.
                 l = (
                     self.scalar_loss(value, target_value) +
                     self.scalar_loss(reward, target_reward) +
                     tf.nn.softmax_cross_entropy_with_logits(
                         logits=policy_logits, labels=target_policy))
 
-                loss += tf.scale_gradient(l, gradient_scale)
+                loss += self.scale_gradient(l, gradient_scale)
 
         for weights in self.network.get_weights():
             loss += self.weight_decay * tf.nn.l2_loss(weights)
@@ -103,6 +113,7 @@ class MuZeroEvalPolicy(Policy):
         self.optimizer.minimize(loss)
 
     def scalar_loss(self, y_true, y_pred):
+        return tf.square(y_true - y_pred)
         # TODO: check if this is correct
         return tf.keras.losses.MSE(y_true, y_pred)
 
