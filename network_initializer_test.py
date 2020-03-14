@@ -26,7 +26,14 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
         hidden_state = self.representation_network(input_image)
         
         self.assertTrue(hidden_state.shape == (1, TicTacToeConfig.hidden_size))
-
+        # print("SUMMARY")
+        # print(self.representation_network.summary())
+        # print("LAYERS")
+        # print(self.representation_network.layers)
+        # print("INPUTS")
+        # print(self.representation_network.inputs)
+        # print("OUTPUTS")
+        # print(self.representation_network.outputs)
         # self.assertEqual(output.value, np.zeros([1, 2*support_size + 1]))
         # self.assertTrue(output.reward == 0)
         # self.assertTrue(output.reward == 0)

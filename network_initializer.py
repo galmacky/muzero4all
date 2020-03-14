@@ -2,6 +2,7 @@ import abc
 
 import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
+from tensorflow.keras.layers import Dense
 from network_architectures import ResnetIdentityBlock 
 from tic_tac_toe_config import TicTacToeConfig
 import numpy as np
@@ -17,69 +18,100 @@ class NetworkInitializer(object):
     def initialize(self):
         pass
 
-class PredictionNetwork(tf.keras.Model):
-    '''
-    Creates a network that returns the policy logits and the value
-    returns : policy_logits, value 
-    '''
-    def __init__(self):
-        super(PredictionNetwork, self).__init__()
-        #Define model here
-        self.policy_network = models.Sequential()
-        self.policy_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
-        self.policy_network.add(layers.Dense(TicTacToeConfig.action_size, activation='relu'))
+# class PredictionNetwork(tf.keras.Model):
+#     '''
+#     Creates a network that returns the policy logits and the value
+#     returns : policy_logits, value 
+#     '''
+#     def __init__(self):
+#         super(PredictionNetwork, self).__init__()
+#         #Define model here
+#         self.policy_network = models.Sequential()
+#         self.policy_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu', input_shape=(TicTacToeConfig.hidden_size,)))
+#         self.policy_network.add(layers.Dense(TicTacToeConfig.action_size, activation='relu', input_shape=(TicTacToeConfig.hidden_size,)))
         
-        self.value_network = models.Sequential()
-        self.value_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
-        # self.value_network.add(layers.Dense(TicTacToeConfig.support_size *2 + 1, activation='relu'))
-        self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation='relu'))
+#         self.value_network = models.Sequential()
+#         self.value_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
+#         # self.value_network.add(layers.Dense(TicTacToeConfig.support_size *2 + 1, activation='relu'))
+#         self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation='relu'))
 
-    def call(self, inputs):
-        policy_logits = self.policy_network(inputs)
-        value = self.value_network(inputs)
-        return (policy_logits, value)
+#     def call(self, inputs):
+#         policy_logits = self.policy_network(inputs)
+#         value = self.value_network(inputs)
+#         return (policy_logits, value)
 
-class DynamicsNetwork(tf.keras.Model):
-    '''
-    Given the current hidden state and action, transition to the next hidden state given action.
-    inputs: hidden_state: current hidden state of muzero algorithm, action: action taken from current hidden state)
-    returns: hidden_state: next hidden state, reward: reward from current hidden state.
+# def PredictionNetwork(inputs):
+
+#     policy_logits = layers.Dense(TicTacToeConfig.hidden_size, activation='relu')(inputs)
+#     policy_logits = layers.Dense(TicTacToeConfig.hidden_size, activation='relu')(policy_logits)
+
+#     value_network = layers.Dense(TicTacToeConfig.hidden_size, activation='relu')(inputs)
+#     value_network = layers.Dense(TicTacToeConfig.value_size, activation='relu')(value_network)
+   
+#     return policy_logits, value_network
+
+    # x = Dropout(0.5)(x)
+    # x = Dense(128, activation='relu')(x)
+    # x = Dropout(0.5)(x)
+    # preds = Dense(10, activation='softmax')(x)
+
+# class DynamicsNetwork(tf.keras.Model):
+#     '''
+#     Given the current hidden state and action, transition to the next hidden state given action.
+#     inputs: hidden_state: current hidden state of muzero algorithm, action: action taken from current hidden state)
+#     returns: hidden_state: next hidden state, reward: reward from current hidden state.
     
-    Actions are encoded spatially in planes of the same resolution as the hidden state. In Atari, this resolution is 6x6 (see description of downsampling in Network Architecture section), in board games this is the same as the board size (19x19 for Go, 8x8 for chess, 9x9 for shogi). 1
-    '''
-    def __init__(self):
-        super(DynamicsNetwork, self).__init__()
-        self.dynamic_network = models.Sequential()
-        self.dynamic_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-        self.dynamic_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
+#     Actions are encoded spatially in planes of the same resolution as the hidden state. In Atari, this resolution is 6x6 (see description of downsampling in Network Architecture section), in board games this is the same as the board size (19x19 for Go, 8x8 for chess, 9x9 for shogi). 1
+#     '''
+#     def __init__(self):
+#         super(DynamicsNetwork, self).__init__()
+#         self.dynamic_network = models.Sequential()
+#         self.dynamic_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu', input_shape=(TicTacToeConfig.representation_size,)))
+#         self.dynamic_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
         
-        self.reward_network = models.Sequential()
-        self.reward_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-        self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation='relu'))
+#         self.reward_network = models.Sequential()
+#         self.reward_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu', input_shape=(TicTacToeConfig.representation_size,)))
+#         self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation='relu'))
     
-    '''
-    Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
-    '''
-    def call(self, inputs):
-        next_hidden_state = self.dynamic_network(inputs)
-        reward = self.reward_network(inputs)
-        return (next_hidden_state, reward)
+#     '''
+#     Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
+#     '''
+#     def call(self, inputs):
+#         next_hidden_state = self.dynamic_network(inputs)
+#         reward = self.reward_network(inputs)
+#         return (next_hidden_state, reward)
 
-class RepresentationNetwork(tf.keras.Model):
-    '''
-    Converts the initial state of the gameboard to the muzero hidden state representation.
-    inputs: initial state
-    returns: hidden state
-    '''
-    def __init__(self):
-        super(RepresentationNetwork, self).__init__()
-        self.representation_network = models.Sequential()
-        self.representation_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-        self.representation_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
+# def DynamicsNetwork(inputs):
+
+#     next_hidden_state = layers.Dense(TicTacToeConfig.representation_size, activation='relu')(inputs)
+#     next_hidden_state = layers.Dense(TicTacToeConfig.hidden_size, activation='relu')(next_hidden_state)
+
+#     reward = layers.Dense(TicTacToeConfig.representation_size, activation='relu')(inputs)
+#     reward = layers.Dense(TicTacToeConfig.reward_size, activation='relu')(reward)
+   
+#     return next_hidden_state, reward
+
+# class RepresentationNetwork(tf.keras.Model):
+#     '''
+#     Converts the initial state of the gameboard to the muzero hidden state representation.
+#     inputs: initial state
+#     returns: hidden state
+#     '''
+#     def __init__(self):
+#         super(RepresentationNetwork, self).__init__()
+#         self.representation_network = models.Sequential()
+#         self.representation_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu', input_shape=(TicTacToeConfig.action_size,)))
+#         self.representation_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
     
-    def call(self, inputs):
-        hidden_state = self.representation_network(inputs)
-        return hidden_state
+#     def call(self, inputs):
+#         hidden_state = self.representation_network(inputs)
+#         return hidden_state
+
+# def RepresentationNetwork(inputs):
+#     hidden_state = layers.Dense(TicTacToeConfig.representation_size, activation='relu')(inputs)
+#     hidden_state = layers.Dense(TicTacToeConfig.hidden_size, activation='relu')(hidden_state)
+
+#     return hidden_state
 
 class DynamicsEncoder(object):
     def encode(self, hidden_state, action):
@@ -105,12 +137,28 @@ class RepresentationEncoder(object):
 class TicTacToeInitializer(NetworkInitializer):
 
     def initialize(self):
-        prediction_network = PredictionNetwork()
-        dynamics_network = DynamicsNetwork()
-        representation_network = RepresentationNetwork()
+        # prediction_network = PredictionNetwork()
+        # dynamics_network = DynamicsNetwork()
+        # representation_network = RepresentationNetwork()
+        # dynamics_encoder = DynamicsEncoder()
+        # representation_encoder = RepresentationEncoder()
+
+        policy_network = tf.keras.Sequential([Dense(TicTacToeConfig.hidden_size, activation='relu'), Dense(TicTacToeConfig.hidden_size, activation='relu')])
+        value_network = tf.keras.Sequential([Dense(TicTacToeConfig.hidden_size, activation='relu'), Dense(TicTacToeConfig.value_size, activation='relu')])
+        reward_network = tf.keras.Sequential([Dense(TicTacToeConfig.representation_size, activation='relu'), Dense(TicTacToeConfig.reward_size, activation='relu')])
+        dynamics_network = tf.keras.Sequential([Dense(TicTacToeConfig.representation_size, activation='relu'), Dense(TicTacToeConfig.hidden_size, activation='relu')])
+        representation_network = tf.keras.Sequential([layers.Dense(TicTacToeConfig.representation_size, activation='relu'),layers.Dense(TicTacToeConfig.hidden_size, activation='relu')])
         dynamics_encoder = DynamicsEncoder()
         representation_encoder = RepresentationEncoder()
-        return (prediction_network, dynamics_network, representation_network, dynamics_encoder, representation_encoder)
+        return (policy_network, value_network, reward_network, dynamics_network, representation_network, dynamics_encoder, representation_encoder)
+
+
+        # prediction_network = PredictionNetwork
+        # dynamics_network = DynamicsNetwork
+        # representation_network = RepresentationNetwork
+        # dynamics_encoder = DynamicsEncoder()
+        # representation_encoder = RepresentationEncoder()
+        # return (prediction_network, dynamics_network, representation_network, dynamics_encoder, representation_encoder)
 
 '''
     Builds the dynamics, representation, and prediction

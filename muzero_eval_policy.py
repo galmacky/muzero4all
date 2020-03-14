@@ -94,10 +94,6 @@ class MuZeroEvalPolicy(Policy):
                 gradient_scale, value, reward, policy_logits = prediction
               
                 target_value, target_reward, target_policy = target
-                # print("target_value", target_value)
-                # print("target_reward", target_reward)
-                # print("target_policy", target_policy)
-                # print("target_policy", target_policy.shape)
                 # TODO: fix reward / target_reward to be float32.
                 l = (
                     self.scalar_loss(value, target_value) +
@@ -110,7 +106,8 @@ class MuZeroEvalPolicy(Policy):
         for weights in self.network.get_weights():
             loss += self.weight_decay * tf.nn.l2_loss(weights)
         
-        get_all_trainable_weights = self.network.get_all_trainable_weights()
+        get_all_trainable_weights = self.network.get_weights()
+        # get_all_trainable_weights = self.network.get_weights()
         print("!!!!!!!!!!!")  ## DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         print(get_all_trainable_weights)
         self.optimizer.minimize(lambda: loss, var_list=get_all_trainable_weights)
@@ -118,7 +115,7 @@ class MuZeroEvalPolicy(Policy):
     def scalar_loss(self, y_true, y_pred):
         return tf.square(y_true - y_pred)
         # TODO: check if this is correct
-        return tf.keras.losses.MSE(y_true, y_pred)
+        # return tf.keras.losses.MSE(y_true, y_pred)
 
     def scale_gradient(self, tensor, scale):
         """Scales the gradient for the backward pass."""

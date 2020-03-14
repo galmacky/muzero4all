@@ -34,27 +34,53 @@ class NetworkOutput(typing.NamedTuple):
 class Network(object):
 
     def __init__(self, initializer: NetworkInitializer):
-        self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.represetnation_encoder = initializer.initialize()
+        # self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.representation_encoder = initializer.initialize()
+        self.policy_network, self.value_network, self.reward_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.representation_encoder = initializer.initialize()
         self.training_steps = 0
 
     def get_all_trainable_weights(self):
-        return (self.prediction_network.trainable_weights + 
-        self.dynamics_network.trainable_weights + 
-        self.representation_network.trainable_weights)
+        # return (self.prediction_network.trainable_weights + 
+        # self.dynamics_network.trainable_weights + 
+        # self.representation_network.trainable_weights)
+
+        networks = (self.representation_network, self.dynamics_network.dynamic_network, self.dynamics_network.reward_network, self.prediction_network.policy_network, self.prediction_network.value_network)
+        return [variables
+                    for variables_list in map(lambda n: n.weights, networks)
+                    for variables in variables_list]
+
+    # def initial_inference(self, image) -> NetworkOutput:
+    #     # representation + prediction function
+    #     hidden_state = self.representation_network(image)
+    #     policy_logits, value = self.prediction_network(hidden_state)
+    #     return NetworkOutput(value, 0, policy_logits, hidden_state)
 
     def initial_inference(self, image) -> NetworkOutput:
         # representation + prediction function
         hidden_state = self.representation_network(image)
-        policy_logits, value = self.prediction_network(hidden_state)
+        policy_logits = self.policy_network(hidden_state)
+        value = self.value_network(hidden_state)
         return NetworkOutput(value, 0, policy_logits, hidden_state)
+
+    # def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
+    #     # dynamics + prediction function
+    #     #Need to encode action information with hidden state before passing
+    #     #to the dynamics function.
+    #     encoded_state = self.dynamics_encoder.encode(hidden_state, action)
+    #     hidden_state, reward = self.dynamics_network(encoded_state)
+    #     policy_logits, value = self.prediction_network(hidden_state)
+    #     #Enable this when value/reward are discrete support sets.
+    #     # value = _decode_support_set(value)
+    #     return NetworkOutput(value, reward, policy_logits, hidden_state)
 
     def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
         # dynamics + prediction function
         #Need to encode action information with hidden state before passing
         #to the dynamics function.
         encoded_state = self.dynamics_encoder.encode(hidden_state, action)
-        hidden_state, reward = self.dynamics_network(encoded_state)
-        policy_logits, value = self.prediction_network(hidden_state)
+        hidden_state = self.dynamics_network(encoded_state)
+        reward = self.reward_network(encoded_state)
+        policy_logits = self.policy_network(hidden_state)
+        value = self.value_network(hidden_state)
         #Enable this when value/reward are discrete support sets.
         # value = _decode_support_set(value)
         return NetworkOutput(value, reward, policy_logits, hidden_state)
@@ -63,14 +89,15 @@ class Network(object):
         # Returns the weights of this network.
         # return np.concatenate(self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights())
         # return np.concatenate([self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights()]).ravel()
-        return self.get_all_trainable_weights()
+        # return self.get_all_trainable_weights()
+        return self.policy_network.trainable_weights + self.value_network.trainable_weights + self.reward_network.trainable_weights + self.dynamics_network.trainable_weights + self.representation_network.trainable_weights
         # weights = []
         # for weight in self.representation_network.get_weights():
-        #     weights.append(weights)
+        #     weights.append(weight)
         # for weight in self.dynamics_network.get_weights():
-        #     weights.append(weights)
+        #     weights.append(weight)
         # for weight in self.prediction_network.get_weights():
-        #     weights.append(weights)
+        #     weights.append(weight)
 
         # return weights
     
