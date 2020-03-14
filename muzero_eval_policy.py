@@ -113,7 +113,7 @@ class MuZeroEvalPolicy(Policy):
         self.optimizer.minimize(loss)
 
     def scalar_loss(self, y_true, y_pred):
-        return tf.square(tf.cast(y_true, dtype=tf.float32) - tf.cast(y_pred, dtype=tf.float32))
+        return tf.square(y_true - y_pred)
         # TODO: check if this is correct
         return tf.keras.losses.MSE(y_true, y_pred)
 

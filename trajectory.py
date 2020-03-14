@@ -31,7 +31,7 @@ class Trajectory(object):
             if bootstrap_index < len(self.root_values):
                 value = self.root_values[bootstrap_index] * self.discount ** td_steps
             else:
-                value = 0
+                value = 0.
 
             for i, reward in enumerate(self.rewards[current_index:bootstrap_index]):
                 value += reward * self.discount ** i  # pytype: disable=unsupported-operands
@@ -42,7 +42,7 @@ class Trajectory(object):
             if current_index > 0 and current_index <= len(self.rewards):
                 last_reward = self.rewards[current_index - 1]
             else:
-                last_reward = 0
+                last_reward = 0.
 
             if current_index < len(self.root_values):
                 targets.append((value, last_reward, self.child_visits[current_index]))
