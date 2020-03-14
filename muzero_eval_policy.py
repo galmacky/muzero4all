@@ -113,7 +113,7 @@ class MuZeroEvalPolicy(Policy):
         get_all_trainable_weights = self.network.get_all_trainable_weights()
         print("!!!!!!!!!!!")  ## DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         print(get_all_trainable_weights)
-        self.optimizer.minimize(loss, var_list=get_all_trainable_weights)
+        self.optimizer.minimize(lambda: loss, var_list=get_all_trainable_weights)
 
     def scalar_loss(self, y_true, y_pred):
         return tf.square(y_true - y_pred)
