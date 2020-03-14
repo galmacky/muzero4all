@@ -37,6 +37,11 @@ class Network(object):
         self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.represetnation_encoder = initializer.initialize()
         self.training_steps = 0
 
+    def get_all_trainable_weights(self):
+        return (self.prediction_network.trainable_weights + 
+        self.dynamics_network.trainable_weights + 
+        self.representation_network.trainable_weights)
+
     def initial_inference(self, image) -> NetworkOutput:
         # representation + prediction function
         hidden_state = self.representation_network(image)
@@ -58,15 +63,16 @@ class Network(object):
         # Returns the weights of this network.
         # return np.concatenate(self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights())
         # return np.concatenate([self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights()]).ravel()
-        weights = []
-        for weight in self.representation_network.get_weights():
-            weights.append(weights)
-        for weight in self.dynamics_network.get_weights():
-            weights.append(weights)
-        for weight in self.prediction_network.get_weights():
-            weights.append(weights)
+        return self.get_all_trainable_weights()
+        # weights = []
+        # for weight in self.representation_network.get_weights():
+        #     weights.append(weights)
+        # for weight in self.dynamics_network.get_weights():
+        #     weights.append(weights)
+        # for weight in self.prediction_network.get_weights():
+        #     weights.append(weights)
 
-        return weights
+        # return weights
     
     def training_steps(self) -> int:
         # How many steps / batches the network has been trained for.
