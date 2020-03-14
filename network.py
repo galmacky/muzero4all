@@ -60,11 +60,11 @@ class Network(object):
         # return np.concatenate([self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights()]).ravel()
         weights = []
         for weight in self.representation_network.get_weights():
-            weights.append(weights)
+            weights.append(weight)
         for weight in self.dynamics_network.get_weights():
-            weights.append(weights)
+            weights.append(weight)
         for weight in self.prediction_network.get_weights():
-            weights.append(weights)
+            weights.append(weight)
 
         return weights
     
