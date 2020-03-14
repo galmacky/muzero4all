@@ -30,4 +30,4 @@ class ReplayBuffer(object):
   def sample_position(self, game) -> int:
     # Sample position from game either uniformly or according to some priority.
     # We do in randomly in MuZero4All.
-    return random.choice(range(len(self.game_states)))
+    return random.choice(range(len(game.game_states)))

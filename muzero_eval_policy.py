@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 
 from policy import Policy
@@ -62,7 +63,7 @@ class MuZeroEvalPolicy(Policy):
             batch = self.replay_buffer.sample_batch(
                 num_unroll_steps, td_steps=10  #TODO: TUNE td_steps
                 )
-            self.update_weights(self.optimizer, batch)
+            self.update_weights(batch)
 
     def update_weights(self, batch):
 
@@ -75,7 +76,7 @@ class MuZeroEvalPolicy(Policy):
 
             # Recurrent steps, from action and previous hidden state.
             for action in actions:
-                value, reward, policy_logits, hidden_state = network.recurrent_inference(
+                value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
                     hidden_state, action)
                 predictions.append((1.0 / len(actions), value, reward, policy_logits))
 
@@ -86,17 +87,21 @@ class MuZeroEvalPolicy(Policy):
                 target_value, target_reward, target_policy = target
 
                 l = (
-                    scalar_loss(value, target_value) +
-                    scalar_loss(reward, target_reward) +
+                    self.scalar_loss(value, target_value) +
+                    self.scalar_loss(reward, target_reward) +
                     tf.nn.softmax_cross_entropy_with_logits(
                         logits=policy_logits, labels=target_policy))
 
                 loss += tf.scale_gradient(l, gradient_scale)
 
-        for weights in network.get_weights():
+        for weights in self.network.get_weights():
             loss += self.weight_decay * tf.nn.l2_loss(weights)
   
-        optimizer.minimize(loss)
+        self.optimizer.minimize(loss)
+
+    def scalar_loss(self, y_true, y_pred):
+        # TODO: check if this is correct
+        return tf.keras.losses.MSE(y_true, y_pred)
 
     def get_policy_logits(self):
         current_state = self.env.get_current_game_input()

@@ -58,6 +58,7 @@ class MuZeroCollectionPolicy(Policy):
         observation = self.env.get_current_game_input()  # Use game state before taking the action.
         states, is_final, reward = self.env.step(best_action)
         trajectory.feed(best_action, reward, p, v, observation)
+        self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):
         # TODO: implement this
