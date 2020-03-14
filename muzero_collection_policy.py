@@ -12,7 +12,7 @@ from trajectory import Trajectory
 class MuZeroCollectionPolicy(Policy):
     """Policy for MuZero."""
 
-    def __init__(self, env, network, replay_buffer=None, num_simulations=100, discount=1.,
+    def __init__(self, env, network, replay_buffer, num_simulations=100, discount=1.,
                  rng: np.random.RandomState = np.random.RandomState()):
         self.network = network
         self.replay_buffer = replay_buffer
@@ -50,18 +50,14 @@ class MuZeroCollectionPolicy(Policy):
     def action(self):
         return self.choose_action(self.get_policy_logits())
 
-    def run_self_play(self, num_times):
+    def run_self_play(self):
         trajectory = Trajectory(discount=self.discount)
-        for _ in range(num_times):
-            p = self.get_policy_logits()
-            v = self.core.get_value()
-            best_action = self.choose_action(p)
-            game_state = self.env.get_current_game_input()  # Use game state before taking the action.
-            states, is_final, reward = self.env.step(best_action)
-            trajectory.feed(best_action, reward, p, v,
-                game_state
-                )
-        self.feed_replay_buffer(trajectory)
+        p = self.get_policy_logits()
+        v = self.core.get_value()
+        best_action = self.choose_action(p)
+        observation = self.env.get_current_game_input()  # Use game state before taking the action.
+        states, is_final, reward = self.env.step(best_action)
+        trajectory.feed(best_action, reward, p, v, observation)
 
     def feed_replay_buffer(self, trajectory):
         # TODO: implement this

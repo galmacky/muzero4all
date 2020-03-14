@@ -95,12 +95,12 @@ class MuZeroEvalPolicy(Policy):
     # IMPORTANT!!!!!!: num_unroll_steps needs to match the size of the rollouts in
     # MCTS +changwan@
     def train(self, num_steps, num_unroll_steps):
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lr)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
         for i in range(num_steps):
             batch = self.replay_buffer.sample_batch(
                 num_unroll_steps, td_steps=10  #TODO: TUNE td_steps
                 )
-            self.update_weights(optimizer, batch)
+            self.update_weights(self.optimizer, batch)
 
     def update_weights(self, batch):
 
