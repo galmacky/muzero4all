@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
+from network import Action
 from policy import Policy
 
 
@@ -69,6 +70,8 @@ class MuZeroEvalPolicy(Policy):
 
         loss = 0
         for image, actions, targets in batch:
+            # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
+            image = np.array(self.env.get_states()).reshape(-1, len(image))
             # Initial step, from the real observation.
             value, reward, policy_logits, hidden_state = self.network.initial_inference(
                 image)
@@ -77,10 +80,10 @@ class MuZeroEvalPolicy(Policy):
             # Recurrent steps, from action and previous hidden state.
             for action in actions:
                 value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
-                    hidden_state, action)
+                    hidden_state, Action(action))
                 predictions.append((1.0 / len(actions), value, reward, policy_logits))
 
-                hidden_state = tf.scale_gradient(hidden_state, 0.5)
+                hidden_state = self.scale_gradient(hidden_state, 0.5)
 
             for prediction, target in zip(predictions, targets):
                 gradient_scale, value, reward, policy_logits = prediction
@@ -102,6 +105,10 @@ class MuZeroEvalPolicy(Policy):
     def scalar_loss(self, y_true, y_pred):
         # TODO: check if this is correct
         return tf.keras.losses.MSE(y_true, y_pred)
+
+    def scale_gradient(self, tensor, scale):
+        """Scales the gradient for the backward pass."""
+        return tensor * scale + tf.stop_gradient(tensor) * (1 - scale)
 
     def get_policy_logits(self):
         current_state = self.env.get_current_game_input()
