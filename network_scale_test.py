@@ -22,19 +22,32 @@ class NetworkScaleTest(unittest.TestCase):
         return tf.square(y_true - y_pred)
 
     def test_train_1(self):
+        self.seed = 0
         self.lr = 3e-2
         self.weight_decay = 1e-4
-        self.network = models.Sequential()
-        self.network.add(layers.Dense(9, activation='relu'))
-        self.network.add(layers.Dense(1, activation='relu'))
+        np.random.seed(self.seed)
+        tf.random.set_seed(self.seed)
+
+        self.model = models.Sequential([
+            layers.Flatten(input_shape=(9,)),
+            layers.Dense(9, activation='relu'),
+            layers.Dropout(0.2),
+            layers.Dense(1, activation=None)
+        ])
+
         self.state = tf.expand_dims(tf.constant([0] * 9), 0)
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
-        self.loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.network.compile(optimizer='adam', loss=self.loss_fn, metrics=['accuracy'])
-        predicted_value = self.network(self.state)
-        actual_value = tf.constant([[.9]])
+        data = np.random.randint(low=0, high=2, size=(10, 9))
+        print (data)
+        self.state = tf.constant(data)
+
+        self.loss_fn = tf.keras.losses.MSE
+        self.model.compile(optimizer='adam', loss=self.loss_fn, metrics=['mae'])
+        predicted_value = self.model(self.state)
+        actual_value = tf.constant([[.9]] * 10)
         print (predicted_value, actual_value)
-        self.network.fit(self.state, actual_value, epochs=20)
+        self.model.fit(self.state, actual_value, epochs=100)
+        loss, _ = self.model.evaluate(self.state, actual_value, verbose=1)
+        self.assertAlmostEqual(0.13333006, loss)
 
 
 if __name__ == '__main__':
