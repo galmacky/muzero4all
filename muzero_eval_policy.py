@@ -73,7 +73,7 @@ class MuZeroEvalPolicy(Policy):
         with tf.GradientTape() as tape:
             for image, actions, targets in batch:
                 # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
-                image = np.array(self.env.get_states()).reshape(-1, len(image))
+                image = np.array(image).reshape(-1, len(image))
                 # Initial step, from the real observation.
                 value, reward, policy_logits, hidden_state = self.network.initial_inference(
                     image)
