@@ -10,6 +10,10 @@ from tic_tac_toe_config import TicTacToeConfig
 
 class TicTacToeNetworkInitializerTest(unittest.TestCase):
     def setUp(self):
+        # Make tests reproducible.
+        np.random.seed(0)
+        tf.random.set_seed(0)
+
         self.env = TicTacToeEnv()
         self.network_initializer = TicTacToeInitializer()
         self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.representation_encoder = self.network_initializer.initialize()
@@ -25,7 +29,7 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
         input_image = np.array(self.env.get_states()).reshape(-1, TicTacToeConfig.action_size)
         hidden_state = self.representation_network(input_image)
         
-        self.assertTrue(hidden_state.shape == (1, TicTacToeConfig.hidden_size))
+        self.assertEqual([1, TicTacToeConfig.hidden_size], hidden_state.shape)
 
         print('LAYERS: ', self.representation_network.layers)
         print('INPUTS: ', self.representation_network.inputs)

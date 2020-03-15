@@ -10,6 +10,9 @@ from tic_tac_toe_config import TicTacToeConfig
 
 class NetworkTest(unittest.TestCase):
     def setUp(self):
+        # Make tests reproducible.
+        np.random.seed(0)
+        tf.random.set_seed(0)
         self.env = TicTacToeEnv()
         self.network_initializer = TicTacToeInitializer()
         self.network = Network(self.network_initializer)
