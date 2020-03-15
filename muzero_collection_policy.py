@@ -52,12 +52,15 @@ class MuZeroCollectionPolicy(Policy):
 
     def run_self_play(self):
         trajectory = Trajectory(discount=self.discount)
-        p = self.get_policy_logits()
-        v = self.core.get_value()
-        best_action = self.choose_action(p)
-        observation = self.env.get_current_game_input()  # Use game state before taking the action.
-        states, is_final, reward = self.env.step(best_action)
-        trajectory.feed(best_action, reward, p, v, observation)
+        while True:
+            p = self.get_policy_logits()
+            v = self.core.get_value()
+            best_action = self.choose_action(p)
+            observation = self.env.get_current_game_input()  # Use game state before taking the action.
+            states, is_final, reward = self.env.step(best_action)
+            trajectory.feed(best_action, reward, p, v, observation)
+            if is_final:
+                break
         self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):
