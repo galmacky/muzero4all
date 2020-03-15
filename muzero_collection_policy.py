@@ -63,6 +63,9 @@ class MuZeroCollectionPolicy(Policy):
             trajectory.feed(best_action, reward, p, v, observation)
             if is_final:
                 break
+        print('!!!!!!!!!!!!!!!!!!!!!!!\n')
+        print('TRAJECTORY ACTIONS: ', trajectory.action_history)
+        print('TRAJECTORY CHILD_VISITS: ', trajectory.child_visits)
         self.feed_replay_buffer((trajectory))
 
     def feed_replay_buffer(self, trajectory):
