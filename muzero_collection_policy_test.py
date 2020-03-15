@@ -76,7 +76,8 @@ class MuZeroCollectionPolicyTicTacToeTest(unittest.TestCase):
         self.policy.run_self_play()
         self.assertEqual(1, len(self.replay_buffer.buffer))
         traj = self.replay_buffer.buffer[0]
-        # self.assertEqual([], str(traj))
+        self.assertEqual([8, 1, 7, 8], traj.action_history)
+        self.assertEqual([0., 0., 0., -1.], traj.rewards)
 
     def play_game_once(self, r_seed):
         self.initialize(True, r_seed)

@@ -64,5 +64,4 @@ class MuZeroCollectionPolicy(Policy):
         self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):
-        # TODO: implement this
         self.replay_buffer.save_game(trajectory)
