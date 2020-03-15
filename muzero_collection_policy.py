@@ -63,7 +63,7 @@ class MuZeroCollectionPolicy(Policy):
             trajectory.feed(best_action, reward, p, v, observation)
             if is_final:
                 break
-        self.feed_replay_buffer((trajectory))
+        self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):
         self.replay_buffer.save_game(trajectory)
