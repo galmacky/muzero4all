@@ -66,7 +66,6 @@ class TicTacToeEnv(MctsEnv):
 
     def get_current_game_input(self):
         return np.array(self._states)
-        #return ''.join([str(pos_rep) for pos_rep in self._states])
 
     def check(self, states):
         sums = [sum((states[0], states[1], states[2])), sum((states[3], states[4], states[5])),

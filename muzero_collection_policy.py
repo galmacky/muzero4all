@@ -12,12 +12,14 @@ from trajectory import Trajectory
 class MuZeroCollectionPolicy(Policy):
     """Policy for MuZero."""
 
-    def __init__(self, env, network, replay_buffer, num_simulations=100, discount=1.,
+    def __init__(self, env, network, replay_buffer, max_moves=1000,
+                 num_simulations=100, discount=1.,
                  rng: np.random.RandomState = np.random.RandomState()):
         self.network = network
         self.replay_buffer = replay_buffer
+        self.max_moves = max_moves
         self.env = env
-        self.model = MuZeroMctsModel(env, self.network)
+        self.model = MuZeroMctsModel(env, self.network)  # TODO: investigate these values?
         self.discount = discount
         # env is used only for the action space.
         self.core = MctsCore(env, self.model, discount=discount)
@@ -52,7 +54,7 @@ class MuZeroCollectionPolicy(Policy):
 
     def run_self_play(self):
         trajectory = Trajectory(discount=self.discount)
-        while True:
+        for _ in range(self.max_moves):
             p = self.get_policy_logits()
             v = self.core.get_value()
             best_action = self.choose_action(p)
@@ -64,5 +66,4 @@ class MuZeroCollectionPolicy(Policy):
         self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):
-        # TODO: implement this
         self.replay_buffer.save_game(trajectory)
