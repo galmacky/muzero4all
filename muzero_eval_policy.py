@@ -24,7 +24,7 @@ class MuZeroEvalPolicy(Policy):
         # TODO(timkim): FIND VALUES
         # AdamOptimizer
         # TODO: TUNE 
-        self.lr = 3e-2
+        self.lr = 3e-1
         self.weight_decay = 1e-4
 
         # self.model = MuZeroMctsModel(env, self.network)

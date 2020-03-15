@@ -16,12 +16,12 @@ from replay_buffer import ReplayBuffer
 from tic_tac_toe_env import TicTacToeEnv
 
 
-TRAIN_ITERATIONS = 1
+TRAIN_ITERATIONS = 10
 
-PLAY_ITERATIONS = 1
+PLAY_ITERATIONS = 20
 
 NUM_TRAIN_STEPS = 20
-NUM_UNROLL_STEPS = 20
+NUM_UNROLL_STEPS = 5
 
 initializer = TicTacToeInitializer()
 env = TicTacToeEnv()
