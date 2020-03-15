@@ -12,10 +12,12 @@ from trajectory import Trajectory
 class MuZeroCollectionPolicy(Policy):
     """Policy for MuZero."""
 
-    def __init__(self, env, network, replay_buffer, num_simulations=100, discount=1.,
+    def __init__(self, env, network, replay_buffer, max_moves=1000,
+                 num_simulations=100, discount=1.,
                  rng: np.random.RandomState = np.random.RandomState()):
         self.network = network
         self.replay_buffer = replay_buffer
+        self.max_moves = max_moves
         self.env = env
         self.model = MuZeroMctsModel(env, self.network)  # TODO: investigate these values?
         self.discount = discount
@@ -50,10 +52,9 @@ class MuZeroCollectionPolicy(Policy):
     def action(self):
         return self.choose_action(self.get_policy_logits())
 
-    # WHY DOES THIS ONLY TAKE 1 STEP?
     def run_self_play(self):
         trajectory = Trajectory(discount=self.discount)
-        while True:
+        for _ in range(self.max_moves):
             p = self.get_policy_logits()
             v = self.core.get_value()
             best_action = self.choose_action(p)
@@ -62,6 +63,7 @@ class MuZeroCollectionPolicy(Policy):
             trajectory.feed(best_action, reward, p, v, observation)
             if is_final:
                 break
+        self.feed_replay_buffer((trajectory))
 
     def feed_replay_buffer(self, trajectory):
         self.replay_buffer.save_game(trajectory)
