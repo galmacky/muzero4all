@@ -14,17 +14,18 @@ from muzero_collection_policy import MuZeroCollectionPolicy
 from muzero_eval_policy import MuZeroEvalPolicy
 from replay_buffer import ReplayBuffer
 from tic_tac_toe_env import TicTacToeEnv
+from simple_env import SimpleEnv
 
 
-TRAIN_ITERATIONS = 1
+TRAIN_ITERATIONS = 20
 
-PLAY_ITERATIONS = 1
+PLAY_ITERATIONS = 20
 
-NUM_TRAIN_STEPS = 20
-NUM_UNROLL_STEPS = 20
+NUM_TRAIN_STEPS = 5
+NUM_UNROLL_STEPS = 5
 
 initializer = TicTacToeInitializer()
-env = TicTacToeEnv()
+env = SimpleEnv()
 
 #env = PacmanDetEnv()
 network = Network(initializer)
@@ -47,19 +48,20 @@ total_reward = 0
 #Reset the env for a game
 env = TicTacToeEnv()
 env.render()
-while True:
-    start_time = time.time()
-    print('Starting action calculation')
-    action = eval_policy.action()
-    states, is_final, reward = env.step(action)
-    total_reward += reward
-    end_time = time.time()
-    print('Action at iter %s: %s\nReward: %s\n'
-        'TotalReward: %s\nCalc time: %s\n\n' 
-        % (idx, action, reward, total_reward, 
-            end_time - start_time))
-    env.render()
-    if is_final:
-        print("Hit is_final!")
-        break
-    idx += 1
+for x in range(10):
+    while True:
+        start_time = time.time()
+        print('Starting action calculation')
+        action = eval_policy.action()
+        states, is_final, reward = env.step(action)
+        total_reward += reward
+        end_time = time.time()
+        print('Action at iter %s: %s\nReward: %s\n'
+            'TotalReward: %s\nCalc time: %s\n\n' 
+            % (idx, action, reward, total_reward, 
+                end_time - start_time))
+        env.render()
+        if is_final:
+            print("Hit is_final!")
+            break
+        idx += 1

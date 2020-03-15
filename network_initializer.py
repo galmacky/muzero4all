@@ -83,20 +83,24 @@ class RepresentationNetwork(tf.keras.Model):
 
 class DynamicsEncoder(object):
     def encode(self, hidden_state, action):
-        encoded_actions = tf.one_hot(action.index, TicTacToeConfig.action_size)
-        encoded_actions = tf.expand_dims(encoded_actions, 0)
-        encoded_hidden_state= tf.concat([hidden_state, encoded_actions], axis=0) 
-        encoded_hidden_state = np.expand_dims(encoded_hidden_state, 0)
-        #Tic Tac Toe uses dense layer so flatten.
-        encoded_hidden_state = tf.expand_dims(tf.reshape(encoded_hidden_state, [-1]), 0)
-        return encoded_hidden_state
+        return hidden_state
+
+        # encoded_actions = tf.one_hot(action.index, TicTacToeConfig.action_size)
+        # encoded_actions = tf.expand_dims(encoded_actions, 0)
+        # encoded_hidden_state= tf.concat([hidden_state, encoded_actions], axis=0) 
+        # encoded_hidden_state = np.expand_dims(encoded_hidden_state, 0)
+        # #Tic Tac Toe uses dense layer so flatten.
+        # encoded_hidden_state = tf.expand_dims(tf.reshape(encoded_hidden_state, [-1]), 0)
+        # return encoded_hidden_state
 
 class RepresentationEncoder(object):
     def encode(self, hidden_state, action):
-        action_plane = tf.one_hot(actions_batch, TicTacToeConfig.action_size)
-        # Recurrent step from conditioned representation: recurrent + prediction networks
-        representation_stack = tf.concat((representation_batch, action_plane), axis=1)
-        return representation_stack
+        return hidden_state
+
+        # action_plane = tf.one_hot(actions_batch, TicTacToeConfig.action_size)
+        # # Recurrent step from conditioned representation: recurrent + prediction networks
+        # representation_stack = tf.concat((representation_batch, action_plane), axis=1)
+        # return representation_stack
 
 '''
     Builds the dynamics, representation, and prediction
