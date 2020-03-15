@@ -30,7 +30,7 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
         print('LAYERS: ', self.representation_network.layers)
         print('INPUTS: ', self.representation_network.inputs)
         print('OUTPUTS: ', self.representation_network.outputs)
-        print('SUMMARY: ', self.representation_network.summary)
+        print('SUMMARY: ', self.representation_network.summary())
 
         # self.assertEqual(output.value, np.zeros([1, 2*support_size + 1]))
         # self.assertTrue(output.reward == 0)
