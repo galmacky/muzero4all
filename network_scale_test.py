@@ -3,7 +3,8 @@ import unittest
 
 from tensorflow.keras import datasets, layers, models
 from muzero_eval_policy import MuZeroEvalPolicy
-from network_initializer import TicTacToeInitializer
+from network_initializer import TicTacToeInitializer, PredictionNetwork, DynamicsNetwork, RepresentationNetwork, \
+    DynamicsEncoder, RepresentationEncoder
 from network import Network
 from network import NetworkOutput
 from network import Action
@@ -88,15 +89,56 @@ class NetworkScaleTest(unittest.TestCase):
 
     def bak_test_update_weights(self):
         self.batch = [
-            (self.get_random_states(), [0], [0]),
-            (self.get_random_states(), [0], [0]),
-            (self.get_random_states(), [0], [0]),
-            (self.get_random_states(), [0], [0]),
-            (self.get_random_states(), [0], [0]),
+            # prediction:
+            1.,
+            (self.get_random_states(), [0, 1], [0]),
+            (self.get_random_states(), [0, 1, 2], [0]),
+            (self.get_random_states(), [0, 1, 2, 3], [0]),
+            (self.get_random_states(), [0, 1, 2, 3, 4], [0]),
         ]
-        loss = 0
+        loss = 0.
 
-        self.network = Network(TicTacToeInitializer.initialize())
+        class InitialInferenceModel(tf.keras.Model):
+            def __init__(self):
+                super(MyModel, self).__init__()
+                self.prediction_network = PredictionNetwork()
+                self.dynamics_network = DynamicsNetwork()
+                self.representation_network = RepresentationNetwork()
+                self.dynamics_encoder = DynamicsEncoder()
+                self.representation_encoder = RepresentationEncoder()
+
+        def initial_inference(self, image) -> NetworkOutput:
+            # representation + prediction function
+            hidden_state = self.representation_network(image)
+            policy_logits, value = self.prediction_network(hidden_state)
+            return NetworkOutput(value, 0, policy_logits, hidden_state)
+
+        def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
+            # dynamics + prediction function
+            # Need to encode action information with hidden state before passing
+            # to the dynamics function.
+            encoded_state = self.dynamics_encoder.encode(hidden_state, action)
+            hidden_state, reward = self.dynamics_network(encoded_state)
+            policy_logits, value = self.prediction_network(hidden_state)
+            # Enable this when value/reward are discrete support sets.
+            # value = _decode_support_set(value)
+            return NetworkOutput(value, reward, policy_logits, hidden_state)
+
+        class MyModel(tf.keras.Model):
+
+            def __init__(self):
+                super(MyModel, self).__init__()
+                self.prediction_network = PredictionNetwork()
+                self.dynamics_network = DynamicsNetwork()
+                self.representation_network = RepresentationNetwork()
+                self.dynamics_encoder = DynamicsEncoder()
+                self.representation_encoder = RepresentationEncoder()
+
+            def call(self, inputs):
+                first_output = self.prediction_network(inputs)
+                return first_output
+
+        self.model = MyModel()
 
         for image, actions, targets in self.batch:
             # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
@@ -117,8 +159,8 @@ class NetworkScaleTest(unittest.TestCase):
 
                 target_value, target_reward, target_policy = target
                 # TODO: fix reward / target_reward to be float32.
-                losses = (layers.losses.MSE, layers.losses.MSE, layers.losses.cross)
 
+        losses = (layers.losses.MSE, layers.losses.MSE, layers.losses.cross)
         # self.optimizer.minimize(lambda: loss, var_list=self.network.get_weights())
         self.network.compile()
         self.network.fit()

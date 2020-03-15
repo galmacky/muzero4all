@@ -91,6 +91,9 @@ class MuZeroEvalPolicy(Policy):
                     gradient_scale, value, reward, policy_logits = prediction
                 
                     target_value, target_reward, target_policy = target
+
+                    print ('prediction:', prediction)
+                    print ('target:', target)
                     # TODO: fix reward / target_reward to be float32.
                     l = (
                         self.scalar_loss(value, target_value) +
