@@ -98,8 +98,8 @@ class MuZeroEvalPolicy(Policy):
                 
                     target_value, target_reward, target_policy = target
 
-                    # print ('prediction:', prediction)
-                    # print ('target:', target)
+                    print ('prediction:', prediction)
+                    print ('target:', target)
                     # TODO: fix reward / target_reward to be float32.
                     value_loss_contrib = self.scalar_loss(value, target_value) 
                     reward_loss_contrib = self.scalar_loss(reward, target_reward)
