@@ -61,6 +61,7 @@ class MuZeroEvalPolicy(Policy):
     def train(self, num_steps, num_unroll_steps):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
         for i in range(num_steps):
+            print("Train Step:", i)
             batch = self.replay_buffer.sample_batch(
                 num_unroll_steps, td_steps=2  #TODO: TUNE td_steps
                 )
@@ -69,51 +70,43 @@ class MuZeroEvalPolicy(Policy):
     def update_weights(self, batch):
 
         loss = 0
-        # for image, actions, targets in batch:
-            # print("-----------------------------")
-            # print('image', image)
-            # print('actions', actions)
-            # print('targets', targets)
-        for image, actions, targets in batch:
-            # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
-            image = np.array(self.env.get_states()).reshape(-1, len(image))
-            # Initial step, from the real observation.
-            value, reward, policy_logits, hidden_state = self.network.initial_inference(
-                image)
-            predictions = [(1.0, value, reward, policy_logits)]
+        with tf.GradientTape() as tape:
+            for image, actions, targets in batch:
+                # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
+                image = np.array(self.env.get_states()).reshape(-1, len(image))
+                # Initial step, from the real observation.
+                value, reward, policy_logits, hidden_state = self.network.initial_inference(
+                    image)
+                predictions = [(1.0, value, reward, policy_logits)]
 
-            # Recurrent steps, from action and previous hidden state.
-            for action in actions:
-                value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
-                    hidden_state, Action(action))
-                predictions.append((1.0 / len(actions), value, reward, policy_logits))
+                # Recurrent steps, from action and previous hidden state.
+                for action in actions:
+                    value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
+                        hidden_state, Action(action))
+                    predictions.append((1.0 / len(actions), value, reward, policy_logits))
 
-                hidden_state = self.scale_gradient(hidden_state, 0.5)
+                    hidden_state = self.scale_gradient(hidden_state, 0.5)
 
-            for prediction, target in zip(predictions, targets):
-                gradient_scale, value, reward, policy_logits = prediction
-              
-                target_value, target_reward, target_policy = target
-                # print("target_value", target_value)
-                # print("target_reward", target_reward)
-                # print("target_policy", target_policy)
-                # print("target_policy", target_policy.shape)
-                # TODO: fix reward / target_reward to be float32.
-                l = (
-                    self.scalar_loss(value, target_value) +
-                    self.scalar_loss(reward, target_reward) +
-                    tf.nn.softmax_cross_entropy_with_logits(
-                        logits=policy_logits, labels=target_policy))
+                for prediction, target in zip(predictions, targets):
+                    gradient_scale, value, reward, policy_logits = prediction
+                
+                    target_value, target_reward, target_policy = target
+                    # TODO: fix reward / target_reward to be float32.
+                    l = (
+                        self.scalar_loss(value, target_value) +
+                        self.scalar_loss(reward, target_reward) +
+                        tf.nn.softmax_cross_entropy_with_logits(
+                            logits=policy_logits, labels=target_policy))
 
-                loss += self.scale_gradient(l, gradient_scale)
+                    loss += self.scale_gradient(l, gradient_scale)
 
-        for weights in self.network.get_weights():
-            loss += self.weight_decay * tf.nn.l2_loss(weights)
+            for weights in self.network.get_weights():
+                loss += self.weight_decay * tf.nn.l2_loss(weights)
         
-        get_all_trainable_weights = self.network.get_all_trainable_weights()
-        print("!!!!!!!!!!!")  ## DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        print(get_all_trainable_weights)
-        self.optimizer.minimize(lambda: loss, var_list=get_all_trainable_weights)
+        # self.optimizer.minimize(lambda: loss, var_list=self.network.get_weights())
+        gradients = tape.gradient(loss, self.network.get_weights())
+        self.optimizer.apply_gradients(zip(gradients, self.network.get_weights()))
+        print('loss', loss)
 
     def scalar_loss(self, y_true, y_pred):
         return tf.square(y_true - y_pred)
@@ -126,9 +119,13 @@ class MuZeroEvalPolicy(Policy):
 
     def get_policy_logits(self):
         current_state = self.env.get_current_game_input()
-        policy_logits, value = self.network.prediction_network(
-            self.network.initial_inference(current_state))
-        return policy_logits
+        current_state = np.expand_dims(current_state, 0)
+        # policy_logits, value = self.network.prediction_network(
+        #     self.network.initial_inference(current_state))
+        network_output = self.network.initial_inference(current_state)
+        return network_output.policy_logits
+        # return policy_logits
 
     def action(self):
-        return tf.math.argmax(self.get_policy_logits())
+        #arg max along logits dimension, not batch dimension, reshape to scalar tensor.
+        return tf.reshape(tf.math.argmax(self.get_policy_logits(),axis=1), [])

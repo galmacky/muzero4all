@@ -42,21 +42,23 @@ for train_iter in range(TRAIN_ITERATIONS):
         print('Self Play Iteration Runtime: {}'.format(end_time - start_time))
     eval_policy.train(NUM_TRAIN_STEPS, NUM_UNROLL_STEPS)
 
-
 idx = 0
 total_reward = 0
+#Reset the env for a game
+env = TicTacToeEnv()
+env.render()
 while True:
     start_time = time.time()
     print('Starting action calculation')
-    end_time = time.time()
     action = eval_policy.action()
     states, is_final, reward = env.step(action)
     total_reward += reward
+    end_time = time.time()
     print('Action at iter %s: %s\nReward: %s\n'
         'TotalReward: %s\nCalc time: %s\n\n' 
         % (idx, action, reward, total_reward, 
             end_time - start_time))
-    env.env.render()
+    env.render()
     if is_final:
         print("Hit is_final!")
         break
