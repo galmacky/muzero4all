@@ -41,8 +41,10 @@ class Trajectory(object):
             # For simplicity the network always predicts the most recently received
             # reward, even for the initial representation network where we already
             # know this reward.
-            if current_index > 0 and current_index <= len(self.rewards):
-                last_reward = self.rewards[current_index - 1]
+            # NOTE: deviation from muzero's pseudocode: we changed this code to
+            # return current index's reward.
+            if current_index > 0 and current_index < len(self.rewards):
+                last_reward = self.rewards[current_index]
             else:
                 last_reward = 0.
 
