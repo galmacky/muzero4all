@@ -1,6 +1,8 @@
 
 import gym
+import numpy as np
 import re
+
 
 from mcts_env import MctsEnv
 
@@ -40,6 +42,9 @@ class FrozenLakeDetEnv(MctsEnv):
         self._states = []
         self.env.reset()
         return self._states
+
+    def get_current_game_input(self):
+        return np.array(self._states)
 
     def get_states(self):
         return self._states
