@@ -82,6 +82,48 @@ class NetworkScaleTest(unittest.TestCase):
         # Decent but slower than single network.
         self.assertLess(loss[0], 1e-01)
 
+    def get_random_states(self):
+        # Returns tic-tac-toe states
+        return np.square(np.random.randint(low=0, high=3, size=(10, 9)))
+
+    def bak_test_update_weights(self):
+        self.batch = [
+            (self.get_random_states(), [0], [0]),
+            (self.get_random_states(), [0], [0]),
+            (self.get_random_states(), [0], [0]),
+            (self.get_random_states(), [0], [0]),
+            (self.get_random_states(), [0], [0]),
+        ]
+        loss = 0
+
+        self.network = Network(TicTacToeInitializer.initialize())
+
+        for image, actions, targets in self.batch:
+            # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
+            image = np.array(image).reshape(-1, len(image))
+            # Initial step, from the real observation.
+            value, reward, policy_logits, hidden_state = self.network.initial_inference(
+                image)
+            predictions = [(1.0, value, reward, policy_logits)]
+
+            # Recurrent steps, from action and previous hidden state.
+            for action in actions:
+                value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
+                    hidden_state, Action(action))
+                predictions.append((1.0 / len(actions), value, reward, policy_logits))
+
+            for prediction, target in zip(predictions, targets):
+                gradient_scale, value, reward, policy_logits = prediction
+
+                target_value, target_reward, target_policy = target
+                # TODO: fix reward / target_reward to be float32.
+                losses = (layers.losses.MSE, layers.losses.MSE, layers.losses.cross)
+
+        # self.optimizer.minimize(lambda: loss, var_list=self.network.get_weights())
+        self.network.compile()
+        self.network.fit()
+        print('loss', loss)
+
 
 if __name__ == '__main__':
     unittest.main()
