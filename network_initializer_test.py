@@ -27,6 +27,11 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
         
         self.assertTrue(hidden_state.shape == (1, TicTacToeConfig.hidden_size))
 
+        print('LAYERS: ', self.representation_network.layers)
+        print('INPUTS: ', self.representation_network.inputs)
+        print('OUTPUTS: ', self.representation_network.outputs)
+        print('SUMMARY: ', self.representation_network.summary)
+
         # self.assertEqual(output.value, np.zeros([1, 2*support_size + 1]))
         # self.assertTrue(output.reward == 0)
         # self.assertTrue(output.reward == 0)
@@ -48,3 +53,6 @@ class TicTacToeNetworkInitializerTest(unittest.TestCase):
         #TODO(FJUR): This should encode 2 planes, a 1 hot plane with the selected action,
         # and a binary plane whether the move was valid or not (all 0's or 1's)
         self.assertTrue(encoded_state.shape == (1, TicTacToeConfig.representation_size))
+
+if __name__ == '__main__':
+    unittest.main()
