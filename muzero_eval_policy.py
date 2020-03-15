@@ -70,10 +70,16 @@ class MuZeroEvalPolicy(Policy):
     def update_weights(self, batch):
 
         loss = 0
+        value_loss_contrib_sum = 0
+        reward_loss_contrib_sum = 0
+        policy_loss_contrib_sum = 0
+        weight_reg_loss_contrib_sum = 0
+
         with tf.GradientTape() as tape:
             for image, actions, targets in batch:
                 # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
-                image = np.array(self.env.get_states()).reshape(-1, len(image))
+                image = np.array(image).reshape(-1, len(image))
+                # print(image.shape)
                 # Initial step, from the real observation.
                 value, reward, policy_logits, hidden_state = self.network.initial_inference(
                     image)
@@ -87,25 +93,42 @@ class MuZeroEvalPolicy(Policy):
 
                     hidden_state = self.scale_gradient(hidden_state, 0.5)
 
+
                 for prediction, target in zip(predictions, targets):
                     gradient_scale, value, reward, policy_logits = prediction
                 
                     target_value, target_reward, target_policy = target
                     # TODO: fix reward / target_reward to be float32.
+                    value_loss_contrib = self.scalar_loss(value, target_value) 
+                    reward_loss_contrib = self.scalar_loss(reward, target_reward)
+                    policy_loss_contrib = tf.nn.softmax_cross_entropy_with_logits(
+                                                logits=policy_logits, labels=target_policy)
+
+                    value_loss_contrib_sum += value_loss_contrib
+                    reward_loss_contrib_sum += reward_loss_contrib
+                    policy_loss_contrib_sum += policy_loss_contrib
+
                     l = (
-                        self.scalar_loss(value, target_value) +
-                        self.scalar_loss(reward, target_reward) +
-                        tf.nn.softmax_cross_entropy_with_logits(
-                            logits=policy_logits, labels=target_policy))
+                        value_loss_contrib +
+                        reward_loss_contrib +
+                        policy_loss_contrib)
 
                     loss += self.scale_gradient(l, gradient_scale)
-
             for weights in self.network.get_weights():
-                loss += self.weight_decay * tf.nn.l2_loss(weights)
+                weight_reg_loss_contrib =  self.weight_decay * tf.nn.l2_loss(weights)
+                weight_reg_loss_contrib_sum += weight_reg_loss_contrib
+                loss += weight_reg_loss_contrib
         
         # self.optimizer.minimize(lambda: loss, var_list=self.network.get_weights())
+        # print('NETWORK_WEIGHTS: ', self.network.get_weights())
         gradients = tape.gradient(loss, self.network.get_weights())
         self.optimizer.apply_gradients(zip(gradients, self.network.get_weights()))
+        print('value_loss_contrib_sum: ', value_loss_contrib_sum)
+        print('reward_loss_contrib_sum: ', reward_loss_contrib_sum)
+        print('policy_loss_contrib_sum: ', policy_loss_contrib_sum)
+        print('weight_reg_loss_contrib_sum: ', weight_reg_loss_contrib_sum)
+
+
         print('loss', loss)
 
     def scalar_loss(self, y_true, y_pred):

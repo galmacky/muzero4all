@@ -19,6 +19,7 @@ class MuZeroMctsModel(MctsModel):
         self.network = network
 
     def get_initial_states(self):
+        # TOOD: FIX THIS NEEDS TO USE OTHER METHOD!!!!!!!!!!!
         # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
         game_state = np.array(self.env.get_states()).reshape(-1, len(self.env.get_states()))
         # Note: we only use the initial hidden states. Other information will be used in a subsequent 'step' method.
