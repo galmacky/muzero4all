@@ -53,11 +53,15 @@ class MuZeroCollectionPolicy(Policy):
     # WHY DOES THIS ONLY TAKE 1 STEP?
     def run_self_play(self):
         trajectory = Trajectory(discount=self.discount)
-        is_final = False
-        while not is_final:   #TODO: MAX TRAJ LENGTH, IMPORTANT FOR PACMAN
+        while True:
+            p = self.get_policy_logits()
+            v = self.core.get_value()
+            best_action = self.choose_action(p)
+            observation = self.env.get_current_game_input()  # Use game state before taking the action.
             states, is_final, reward = self.env.step(best_action)
             trajectory.feed(best_action, reward, p, v, observation)
-            self.feed_replay_buffer(trajectory)
+            if is_final:
+                break
 
     def feed_replay_buffer(self, trajectory):
         self.replay_buffer.save_game(trajectory)
