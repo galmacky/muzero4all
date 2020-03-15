@@ -29,7 +29,7 @@ class MuZeroCollectionPolicy(Policy):
     def reset(self):
         self.model.reset()
 
-    def get_policy_logits(self):
+    def get_policy_logits(self): # ??WRONG?
         self.core.initialize()
         for _ in range(self.num_simulations):
             self.core.rollout()
@@ -53,6 +53,7 @@ class MuZeroCollectionPolicy(Policy):
         return self.choose_action(self.get_policy_logits())
 
     def run_self_play(self):
+        self.env.reset()
         trajectory = Trajectory(discount=self.discount)
         for _ in range(self.max_moves):
             p = self.get_policy_logits()
