@@ -66,7 +66,7 @@ class MuZeroCollectionPolicy(Policy):
         print('!!!!!!!!!!!!!!!!!!!!!!!\n')
         print('TRAJECTORY ACTIONS: ', trajectory.action_history)
         print('TRAJECTORY CHILD_VISITS: ', trajectory.child_visits)
-        self.feed_replay_buffer((trajectory))
+        self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):
         self.replay_buffer.save_game(trajectory)
