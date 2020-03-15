@@ -7,7 +7,7 @@ class ReplayBuffer(object):
 
   def __init__(self):
     self.window_size = 1e6  # TODO: TUNE SMALLER ?
-    self.batch_size = 2048  # TODO: TUNE SMALLER ?
+    self.batch_size = 5  # TODO: TUNE SMALLER ?
     self.buffer = []  # Holds trajectories
 
   def save_game(self, game):
