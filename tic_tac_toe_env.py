@@ -3,7 +3,6 @@ import numpy as np
 
 from mcts_env import MctsEnv
 
-
 class TicTacToeEnv(MctsEnv):
 
     def __init__(self, r_seed=0, use_random=False):
@@ -12,6 +11,16 @@ class TicTacToeEnv(MctsEnv):
         self.r_seed_init = r_seed
         self.r_seed = r_seed
         self.use_random = use_random
+    
+    def render(self):
+        print("")
+        print("------")
+        print("{}|{}|{}".format(self._states[0],self._states[1],self._states[2]))
+        print("------")
+        print("{}|{}|{}".format(self._states[3],self._states[4],self._states[5]))
+        print("------")
+        print("{}|{}|{}".format(self._states[6],self._states[7],self._states[8]))
+        print("------")
 
     def reset(self):
         self._states = [0] * 9

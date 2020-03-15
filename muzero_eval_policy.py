@@ -106,6 +106,7 @@ class MuZeroEvalPolicy(Policy):
         # self.optimizer.minimize(lambda: loss, var_list=self.network.get_weights())
         gradients = tape.gradient(loss, self.network.get_weights())
         self.optimizer.apply_gradients(zip(gradients, self.network.get_weights()))
+        print('loss', loss)
 
     def scalar_loss(self, y_true, y_pred):
         return tf.square(y_true - y_pred)
