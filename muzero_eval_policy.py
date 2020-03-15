@@ -79,7 +79,6 @@ class MuZeroEvalPolicy(Policy):
             for image, actions, targets in batch:
                 # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
                 image = np.array(image).reshape(-1, len(image))
-                # print(image.shape)
                 # Initial step, from the real observation.
                 value, reward, policy_logits, hidden_state = self.network.initial_inference(
                     image)
@@ -98,6 +97,9 @@ class MuZeroEvalPolicy(Policy):
                     gradient_scale, value, reward, policy_logits = prediction
                 
                     target_value, target_reward, target_policy = target
+
+                    print ('prediction:', prediction)
+                    print ('target:', target)
                     # TODO: fix reward / target_reward to be float32.
                     value_loss_contrib = self.scalar_loss(value, target_value) 
                     reward_loss_contrib = self.scalar_loss(reward, target_reward)

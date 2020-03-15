@@ -15,8 +15,9 @@ class Env(object):
     def reset(self) -> List:
         pass
 
+    # TODO: rename this to observation
     @abc.abstractmethod
-    def get_states(self):
+    def get_current_game_input(self):
         pass
 
     @abc.abstractmethod

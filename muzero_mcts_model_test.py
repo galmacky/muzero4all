@@ -14,6 +14,9 @@ from tic_tac_toe_config import TicTacToeConfig
 class MuZeroMctsModelTest(unittest.TestCase):
 
     def setUp(self):
+        # Set seeds to make the results reproducible.
+        np.random.seed(0)
+        tf.random.set_seed(0)
         self.env = TicTacToeEnv()
         self.network_initializer = TicTacToeInitializer()
         self.network = Network(self.network_initializer)
@@ -24,16 +27,12 @@ class MuZeroMctsModelTest(unittest.TestCase):
         tf.assert_equal(tf.constant(tf.zeros((1, 9))), hidden_state)
         model_step = self.model.step(hidden_state, 1)
         # Not trained, so returning an empty states.
-        tf.assert_equal(tf.constant(tf.zeros((1, 9))), model_step[0])  # states
-        self.assertFalse(model_step[1])  # is_final
+        self.assertEqual([1, 9], model_step[0].shape)  # states
+        self.assertFalse(model_step[1])  # is_final is always false in MuZero MCTS
         self.assertEqual(0.0, model_step[2])
-        # Note: Policy logits are all empty. This could be problematic since it affects initial
-        # exploration.
-        tf.assert_equal(tf.constant(tf.zeros((1, 9))), model_step[3])  # policy
-        # MuZeroMctsModel internally removes the outer dimension of policy prior.
-        self.assertEqual(0.0, model_step[3][0])
-        # TODO: this should be a single value?
-        tf.assert_equal(tf.constant(tf.zeros((1, 21))), model_step[4])  # value
+        self.assertEqual([9], model_step[3].shape)  # policy
+        # TODO: remove the outer dimension.
+        self.assertEqual([1, 1], model_step[4].shape)  # value
 
 
 if __name__ == '__main__':
