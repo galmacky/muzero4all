@@ -45,8 +45,8 @@ class NetworkScaleTest(unittest.TestCase):
         predicted_value = self.model(self.state)
         actual_value = tf.constant([[.9]] * 10)
         print (predicted_value, actual_value)
-        self.model.fit(self.state, actual_value, epochs=100)
-        loss, _ = self.model.evaluate(self.state, actual_value, verbose=1)
+        self.model.fit(self.state, actual_value, epochs=100, verbose=0)
+        loss, _ = self.model.evaluate(self.state, actual_value, verbose=0)
         self.assertAlmostEqual(0.13333006, loss)
 
 
