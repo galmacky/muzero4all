@@ -14,8 +14,14 @@ import numpy as np
 from tic_tac_toe_config import TicTacToeConfig
 
 
-class MuZeroEvalPolicyTest(unittest.TestCase):
+class NetworkScaleTest(unittest.TestCase):
     def setUp(self):
+        pass
+
+    def scalar_loss(self, y_true, y_pred):
+        return tf.square(y_true - y_pred)
+
+    def test_train_1(self):
         self.lr = 3e-2
         self.weight_decay = 1e-4
         self.network = models.Sequential()
@@ -25,15 +31,10 @@ class MuZeroEvalPolicyTest(unittest.TestCase):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
         self.loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.network.compile(optimizer='adam', loss=self.loss_fn, metrics=['accuracy'])
-
-    def scalar_loss(self, y_true, y_pred):
-        return tf.square(y_true - y_pred)
-
-    def test_train(self):
         predicted_value = self.network(self.state)
         actual_value = tf.constant([[.9]])
         print (predicted_value, actual_value)
-        self.network.fit(self.state, actual_value, epochs=5)
+        self.network.fit(self.state, actual_value, epochs=20)
 
 
 if __name__ == '__main__':
