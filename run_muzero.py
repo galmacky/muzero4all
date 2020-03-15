@@ -17,9 +17,9 @@ from tic_tac_toe_env import TicTacToeEnv
 from simple_env import SimpleEnv
 
 
-TRAIN_ITERATIONS = 20
+TRAIN_ITERATIONS = 5
 
-PLAY_ITERATIONS = 20
+PLAY_ITERATIONS = 10
 
 NUM_TRAIN_STEPS = 5
 NUM_UNROLL_STEPS = 5
@@ -46,7 +46,7 @@ for train_iter in range(TRAIN_ITERATIONS):
 idx = 0
 total_reward = 0
 #Reset the env for a game
-env = TicTacToeEnv()
+env = SimpleEnv()
 env.render()
 for x in range(10):
     while True:
