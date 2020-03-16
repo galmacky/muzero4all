@@ -16,6 +16,7 @@ class ReplayBuffer(object):
     self.buffer.append(game)
 
   def sample_batch(self, num_unroll_steps: int, td_steps: int):
+    # print('num_unroll_steps: ', num_unroll_steps)
     games = [self.sample_game() for _ in range(self.batch_size)]
     game_pos = [(g, self.sample_position(g)) for g in games]
     return [(g.make_image(i), g.action_history[i:i + num_unroll_steps],

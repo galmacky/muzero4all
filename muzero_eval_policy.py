@@ -96,17 +96,27 @@ class MuZeroEvalPolicy(Policy):
 
                 for prediction, target in zip(predictions, targets):
                     gradient_scale, value, reward, policy_logits = prediction
-                
+                    print('\nPREDICTIONS:\n')
+                    print('gradient_scale: ', gradient_scale)
+                    print('value: ', value)
+                    print('reward: ', reward)
+                    print('policy_logits: ', policy_logits)
                     target_value, target_reward, target_policy = target
+                    print('\nTARGETS:\n')
+                    print('target_value: ', target_value)
+                    print('target_reward: ', target_reward)
+                    print('target_policy: ', target_policy)
 
                     # print ('prediction:', prediction)
                     # print ('target:', target)
                     # TODO: fix reward / target_reward to be float32.
                     value_loss_contrib = self.scalar_loss(value, target_value) 
+                    print('value_loss_contrib: ', value_loss_contrib)
                     reward_loss_contrib = self.scalar_loss(reward, target_reward)
+                    print('reward_loss_contrib: ', reward_loss_contrib)
                     policy_loss_contrib = tf.nn.softmax_cross_entropy_with_logits(
                                                 logits=policy_logits, labels=target_policy)
-
+                    print('policy_loss_contrib: ', policy_loss_contrib)
                     value_loss_contrib_sum += value_loss_contrib
                     reward_loss_contrib_sum += reward_loss_contrib
                     policy_loss_contrib_sum += policy_loss_contrib
