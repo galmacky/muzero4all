@@ -56,7 +56,7 @@ class MuZeroCollectionPolicy(Policy):
     def run_self_play(self):
         self.env.reset()
         trajectory = Trajectory(discount=self.discount)
-        print("####### START")
+        print("####### START run_self_play")
         for _ in range(self.max_moves):
             p = self.get_policy_logits()
             v = self.core.get_value()
@@ -64,7 +64,7 @@ class MuZeroCollectionPolicy(Policy):
             observation = self.env.get_current_game_input()  # Use game state before taking the action.
             states, is_final, reward = self.env.step(best_action)
             ######## BUG HERE!!!!!!!!!!! ISFINAL NEVER TRIGGERED
-            print(states, is_final, reward)
+            print('self play env step res: ', states, is_final, reward)
             trajectory.feed(best_action, reward, p, v, observation)
             if is_final:
                 print("#######")
