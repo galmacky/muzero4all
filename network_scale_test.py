@@ -1,4 +1,3 @@
-
 import unittest
 
 from tensorflow.keras import datasets, layers, models
@@ -173,42 +172,44 @@ class NetworkScaleTest(unittest.TestCase):
 
     def test_seq_to_seq(self):
         #print (self.get_random_states())
-        train_x = [[
-            [0.1, 1.0],
-            [0.1, 1.0],
-            [0.1, 1.0],
-            [0.1, 1.0],
-            [0.1, 1.0],
-        ]]
+        train_x = []
+        # Data size: 10 x (image + 2 actions) x board/action size
+        train_x = np.random.randint(0, 2, size=(10, 3, 9))
+
+        # train_x = [
+        #     [
+        #     [0.1, 1.0],
+        #     [0.1, 1.0],
+        #     [0.1, 1.0],
+        #     [0.1, 1.0],
+        #     [0.1, 1.0],
+        # ]]
         # 1 being the batch size
         # 10 being the length
-        train_x = np.random.randint(low=0, high=2, size=(1, 10, 9))
+        #train_x = np.random.randint(low=0, high=2, size=(1, 10, 9))
 
-        train_y = [
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-            0.11,
-        ]
+        train_y = [[0.11, 0.11, 0.11]] * 10
 
-        train_y = [ 0.11 ]
-        train_y = np.array([ 0.11 ])
+        #train_y = [ 0.11 ]
+        train_y = np.array(train_y)
 
         model = Sequential()
-        #model.add(layers.Flatten(input_shape=(10, 9))),
-        #model.add(layers.Embedding(input_shape=(90), ))
-        model.add(layers.LSTM(units=10, input_shape=(10, 9), return_sequences=False))
+        #model.add(layers.Flatten(input_shape=(3, 9))),
+        #model.add(layers.Embedding(input_shape=(10, 9), ))
+        model.add(layers.LSTM(units=100, input_shape=(3, 9), return_sequences=True))
         model.add(layers.Dropout(rate=0.25))
+        model.add(layers.Dense(50, activation='relu'))
         model.add(layers.Dense(1, activation=None))
         model.compile(optimizer='adam', loss=tf.losses.MSE, metrics=['mae'])
         print (model.summary())
-        model.fit(x=train_x, y=train_y, epochs=100)
+        model.fit(x=train_x, y=train_y, epochs=100, verbose=0)
+        loss = model.evaluate(train_x, train_y, verbose=2)
+        self.assertLess(loss[0], 1e-04)
+
+    def test_update_weights(self):
+        # Input: A list of input: (image, list of actions)
+        # Output: A list of target: (list of (priors, value, reward))
+        pass
 
     def bak_test_update_weights(self):
         target = (0.11, -1.)
