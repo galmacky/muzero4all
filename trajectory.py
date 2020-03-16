@@ -18,10 +18,16 @@ class Trajectory(object):
              game_state):
         # Each of these are the same size, per each state we've visited in the
         # trajectory.
-        self.action_history.append(action.numpy())
+        if not (isinstance(action, int) or isinstance(action, float)):
+            action = action.numpy()
+        if not (isinstance(child_visit_dist, dict)):
+            child_visit_dist = child_visit_dist.numpy()
+        if not (isinstance(root_value, int) or isinstance(root_value, float)):
+            root_value = root_value.numpy()
+        self.action_history.append(action)
         self.rewards.append(reward)
-        self.child_visits.append(child_visit_dist.numpy())
-        self.root_values.append(root_value.numpy())
+        self.child_visits.append(child_visit_dist)
+        self.root_values.append(root_value)
         self.game_states.append(game_state)
 
     def make_target(self, state_index: int, num_unroll_steps: int, td_steps: int):

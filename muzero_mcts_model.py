@@ -35,6 +35,6 @@ class MuZeroMctsModel(MctsModel):
         output = self.network.recurrent_inference(parent_states, Action(action))
         # Note: we do not have is_final value. This can cause a serious error.
         policy_logits = tf.reshape(output.policy_logits, [len(self.env.action_space)])
-        print('Step action: ', action)
-        print('Step reward: ', output.reward.numpy())
+        # print('Step action: ', action)
+        # print('Step reward: ', output.reward.numpy())
         return output.hidden_state, output.reward == -1, output.reward, policy_logits, output.value
