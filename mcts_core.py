@@ -67,6 +67,14 @@ class MctsCore(object):
         assert self._root.expanded(), (
                 'You should be able to take an action from the root.')
 
+    def add_exploration_noise(self):
+        node = self._root
+        actions = list(node.children.keys())
+        noise = np.random.dirichlet([0.3] * len(actions))
+        frac = 0.25
+        for a, n in zip(actions, noise):
+            node.children[a].prior = node.children[a].prior * (1 - frac) + n * frac
+
     def rollout(self):
         node, search_path, last_action = self.select_node()
         self.expand_node(node)

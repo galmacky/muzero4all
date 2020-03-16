@@ -31,6 +31,7 @@ class MuZeroCollectionPolicy(Policy):
 
     def get_policy_logits(self): # ??WRONG?
         self.core.initialize()
+        self.core.add_exploration_noise()
         for _ in range(self.num_simulations):
             self.core.rollout()
         policy_logits = tf.convert_to_tensor(self.core.get_policy_distribution())

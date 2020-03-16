@@ -3,8 +3,7 @@ import unittest
 
 from tensorflow.keras import datasets, layers, models
 from muzero_eval_policy import MuZeroEvalPolicy
-from network_initializer import TicTacToeInitializer, PredictionNetwork, DynamicsNetwork, RepresentationNetwork, \
-    DynamicsEncoder, RepresentationEncoder
+from network_initializer import TicTacToeInitializer
 from network import Network
 from network import NetworkOutput
 from network import Action
@@ -97,32 +96,6 @@ class NetworkScaleTest(unittest.TestCase):
             (self.get_random_states(), [0, 1, 2, 3, 4], [0]),
         ]
         loss = 0.
-
-        class InitialInferenceModel(tf.keras.Model):
-            def __init__(self):
-                super(MyModel, self).__init__()
-                self.prediction_network = PredictionNetwork()
-                self.dynamics_network = DynamicsNetwork()
-                self.representation_network = RepresentationNetwork()
-                self.dynamics_encoder = DynamicsEncoder()
-                self.representation_encoder = RepresentationEncoder()
-
-        def initial_inference(self, image) -> NetworkOutput:
-            # representation + prediction function
-            hidden_state = self.representation_network(image)
-            policy_logits, value = self.prediction_network(hidden_state)
-            return NetworkOutput(value, 0, policy_logits, hidden_state)
-
-        def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
-            # dynamics + prediction function
-            # Need to encode action information with hidden state before passing
-            # to the dynamics function.
-            encoded_state = self.dynamics_encoder.encode(hidden_state, action)
-            hidden_state, reward = self.dynamics_network(encoded_state)
-            policy_logits, value = self.prediction_network(hidden_state)
-            # Enable this when value/reward are discrete support sets.
-            # value = _decode_support_set(value)
-            return NetworkOutput(value, reward, policy_logits, hidden_state)
 
         class MyModel(tf.keras.Model):
 
