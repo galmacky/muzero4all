@@ -65,6 +65,7 @@ class MuZeroEvalPolicy(Policy):
             batch = self.replay_buffer.sample_batch(
                 num_unroll_steps, td_steps=2  #TODO: TUNE td_steps
                 )
+            print('BATCH: ', batch)
             self.update_weights(batch)
 
     def update_weights(self, batch):
