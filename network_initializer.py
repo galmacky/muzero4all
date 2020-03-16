@@ -34,7 +34,7 @@ class TicTacToeInitializer(NetworkInitializer):
             #Define model here
             self.policy_network = models.Sequential()
             self.policy_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
-            self.policy_network.add(layers.Dense(TicTacToeConfig.action_size, activation=None))
+            self.policy_network.add(layers.Dense(TicTacToeConfig.action_size, activation='relu'))
             
             self.value_network = models.Sequential()
             self.value_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
