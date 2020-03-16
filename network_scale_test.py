@@ -2,6 +2,8 @@
 import unittest
 
 from tensorflow.keras import datasets, layers, models
+from tensorflow_core.python.keras import Sequential
+
 from muzero_eval_policy import MuZeroEvalPolicy
 from network_initializer import TicTacToeInitializer
 from network import Network
@@ -12,6 +14,7 @@ from tic_tac_toe_env import TicTacToeEnv
 import tensorflow as tf
 import numpy as np
 from tic_tac_toe_config import TicTacToeConfig
+from tensorflow.keras.preprocessing import sequence
 
 
 class PredictionNetwork(tf.keras.Model):
@@ -166,16 +169,55 @@ class NetworkScaleTest(unittest.TestCase):
 
     def get_random_states(self):
         # Returns tic-tac-toe states
-        return np.square(np.random.randint(low=0, high=3, size=(10, 9)))
+        return np.random.randint(low=0, high=2, size=(9))
+
+    def test_seq_to_seq(self):
+        #print (self.get_random_states())
+        train_x = [[
+            [0.1, 1.0],
+            [0.1, 1.0],
+            [0.1, 1.0],
+            [0.1, 1.0],
+            [0.1, 1.0],
+        ]]
+        # 1 being the batch size
+        # 10 being the length
+        train_x = np.random.randint(low=0, high=2, size=(1, 10, 9))
+
+        train_y = [
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+            0.11,
+        ]
+
+        train_y = [ 0.11 ]
+        train_y = np.array([ 0.11 ])
+
+        model = Sequential()
+        #model.add(layers.Flatten(input_shape=(10, 9))),
+        #model.add(layers.Embedding(input_shape=(90), ))
+        model.add(layers.LSTM(units=10, input_shape=(10, 9), return_sequences=False))
+        model.add(layers.Dropout(rate=0.25))
+        model.add(layers.Dense(1, activation=None))
+        model.compile(optimizer='adam', loss=tf.losses.MSE, metrics=['mae'])
+        print (model.summary())
+        model.fit(x=train_x, y=train_y, epochs=100)
 
     def bak_test_update_weights(self):
+        target = (0.11, -1.)
         self.batch = [
-            # prediction:
-            1.,
-            (self.get_random_states(), [0, 1], [0]),
-            (self.get_random_states(), [0, 1, 2], [0]),
-            (self.get_random_states(), [0, 1, 2, 3], [0]),
-            (self.get_random_states(), [0, 1, 2, 3, 4], [0]),
+            (self.get_random_states(), [0], [target]),
+            (self.get_random_states(), [0, 1], [target] * 2),
+            (self.get_random_states(), [0, 1, 2], [target] * 3),
+            (self.get_random_states(), [0, 1, 2, 3], [target] * 4),
+            (self.get_random_states(), [0, 1, 2, 3, 4], [target] * 5),
         ]
         loss = 0.
 
@@ -183,13 +225,26 @@ class NetworkScaleTest(unittest.TestCase):
 
             def __init__(self):
                 super(MyModel, self).__init__()
+                self.first_network = models.Sequential([
+                    layers.Dense(9, activation='relu'),
+                    layers.Dense(1, activation='relu')
+                ])
+                self.second_network = models.Sequential([
+                    layers.Dense(9, activation='relu'),
+                    layers.Dense(1, activation='relu')
+                ])
+
+            def call(self, inputs):
+                first_output = self.first_network(inputs)
+                second_output = self.second_network(inputs)
+                return first_output, second_output
+
                 self.prediction_network = PredictionNetwork()
                 self.dynamics_network = DynamicsNetwork()
                 self.representation_network = RepresentationNetwork()
                 self.dynamics_encoder = DynamicsEncoder()
 
             def call(self, inputs):
-                first_output = self.prediction_network(inputs)
                 return first_output
 
             def initial_inference(self, image) -> NetworkOutput:
@@ -215,13 +270,13 @@ class NetworkScaleTest(unittest.TestCase):
             # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
             image = np.array(image).reshape(-1, len(image))
             # Initial step, from the real observation.
-            value, reward, policy_logits, hidden_state = self.network.initial_inference(
+            value, reward, policy_logits, hidden_state = self.model.initial_inference(
                 image)
             predictions = [(1.0, value, reward, policy_logits)]
 
             # Recurrent steps, from action and previous hidden state.
             for action in actions:
-                value, reward, policy_logits, hidden_state = self.network.recurrent_inference(
+                value, reward, policy_logits, hidden_state = self.model.recurrent_inference(
                     hidden_state, Action(action))
                 predictions.append((1.0 / len(actions), value, reward, policy_logits))
 
@@ -233,8 +288,8 @@ class NetworkScaleTest(unittest.TestCase):
 
         losses = (layers.losses.MSE, layers.losses.MSE, layers.losses.cross)
         # self.optimizer.minimize(lambda: loss, var_list=self.network.get_weights())
-        self.network.compile()
-        self.network.fit()
+        self.network.compile(optimizer='adam', loss=losses)
+        #self.network.fit(x=train_x, y=train_y, batch=len(self.batch))
         print('loss', loss)
 
 
