@@ -16,11 +16,11 @@ from replay_buffer import ReplayBuffer
 from tic_tac_toe_env import TicTacToeEnv
 
 
-TRAIN_ITERATIONS = 5
+TRAIN_ITERATIONS = 200
 
-PLAY_ITERATIONS = 5
+PLAY_ITERATIONS = 20
 
-NUM_TRAIN_STEPS = 5
+NUM_TRAIN_STEPS = 20
 NUM_UNROLL_STEPS = 5
 
 initializer = TicTacToeInitializer()
@@ -41,6 +41,8 @@ for train_iter in range(TRAIN_ITERATIONS):
         end_time = time.time()
         print('Self Play Iteration Runtime: {}'.format(end_time - start_time))
     eval_policy.train(NUM_TRAIN_STEPS, NUM_UNROLL_STEPS)
+
+# TODO: pacman, save weights, tensorboard
 
 idx = 0
 total_reward = 0

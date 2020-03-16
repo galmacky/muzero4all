@@ -34,12 +34,12 @@ class TicTacToeInitializer(NetworkInitializer):
             #Define model here
             self.policy_network = models.Sequential()
             self.policy_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
-            self.policy_network.add(layers.Dense(TicTacToeConfig.action_size, activation='relu'))
+            self.policy_network.add(layers.Dense(TicTacToeConfig.action_size, activation=None))
             
             self.value_network = models.Sequential()
             self.value_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
             # self.value_network.add(layers.Dense(TicTacToeConfig.support_size *2 + 1, activation='relu'))
-            self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation='relu'))
+            self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation=None))
 
         def call(self, inputs):
             policy_logits = self.policy_network(inputs)
@@ -58,11 +58,11 @@ class TicTacToeInitializer(NetworkInitializer):
             super(TicTacToeInitializer().DynamicsNetwork, self).__init__()
             self.dynamic_network = models.Sequential()
             self.dynamic_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-            self.dynamic_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
+            self.dynamic_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation=None))
             
             self.reward_network = models.Sequential()
             self.reward_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-            self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation='relu'))
+            self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation=None))
         
         '''
         Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
@@ -82,7 +82,7 @@ class TicTacToeInitializer(NetworkInitializer):
             super(TicTacToeInitializer().RepresentationNetwork, self).__init__()
             self.representation_network = models.Sequential()
             self.representation_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-            self.representation_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
+            self.representation_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation=None))
         
         def call(self, inputs):
             hidden_state = self.representation_network(inputs)
@@ -113,6 +113,8 @@ class TicTacToeInitializer(NetworkInitializer):
         representation_encoder = TicTacToeInitializer().RepresentationEncoder()
         return (prediction_network, dynamics_network, representation_network, dynamics_encoder, representation_encoder)
 
+
+# TODO: IMPORTANT!!!!!!!!! GET RID OF RELU IN LAST OUTPUT LAYERS WHEN WE NEED NEGATIVE OUTPUTS
 '''
     Builds the dynamics, representation, and prediction
     models for playing Ms Pacman games.
