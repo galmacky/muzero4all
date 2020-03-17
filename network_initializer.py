@@ -131,7 +131,7 @@ class PacManInitializer(NetworkInitializer):
             #Define model here
             self.policy_network = models.Sequential()
             self.policy_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
-            self.policy_network.add(layers.Dense(PacManConfig.action_size, activation='relu'))
+            self.policy_network.add(layers.Dense(PacManConfig.action_size, activation=None))
             
             self.value_network = models.Sequential()
             self.value_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
