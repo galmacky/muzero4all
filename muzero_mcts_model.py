@@ -22,7 +22,9 @@ class MuZeroMctsModel(MctsModel):
         # TOOD: FIX THIS NEEDS TO USE OTHER METHOD!!!!!!!!!!!
         # Reshape the states to be -1 x n dimension: -1 being the outer batch dimension.
         inputs = self.env.get_current_game_input()
-        game_state = inputs.reshape(-1, len(inputs))
+        game_state = tf.expand_dims(inputs, 0)
+        game_state = tf.cast(game_state, dtype=tf.float32)
+        #game_state = inputs.reshape(-1, len(inputs))
         # Note: we only use the initial hidden states. Other information will be used in a subsequent 'step' method.
         output = self.network.initial_inference(game_state)
         return output.hidden_state
