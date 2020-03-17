@@ -39,7 +39,7 @@ class TicTacToeInitializer(NetworkInitializer):
             self.value_network = models.Sequential()
             self.value_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='relu'))
             # self.value_network.add(layers.Dense(TicTacToeConfig.support_size *2 + 1, activation='relu'))
-            self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation=None))
+            self.value_network.add(layers.Dense(TicTacToeConfig.value_size, activation='tanh'))
 
         def call(self, inputs):
             policy_logits = self.policy_network(inputs)
@@ -62,7 +62,7 @@ class TicTacToeInitializer(NetworkInitializer):
             
             self.reward_network = models.Sequential()
             self.reward_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-            self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation=None))
+            self.reward_network.add(layers.Dense(TicTacToeConfig.reward_size, activation='tanh'))
         
         '''
         Input is hidden state concat 2 one hot encodings planes of 9x9. 1 hot for action in tic tac toe, 1 for if valid.
@@ -82,7 +82,7 @@ class TicTacToeInitializer(NetworkInitializer):
             super(TicTacToeInitializer().RepresentationNetwork, self).__init__()
             self.representation_network = models.Sequential()
             self.representation_network.add(layers.Dense(TicTacToeConfig.representation_size, activation='relu'))
-            self.representation_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation=None))
+            self.representation_network.add(layers.Dense(TicTacToeConfig.hidden_size, activation='tanh'))
         
         def call(self, inputs):
             hidden_state = self.representation_network(inputs)

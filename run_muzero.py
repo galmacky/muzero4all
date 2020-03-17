@@ -14,7 +14,7 @@ from muzero_collection_policy import MuZeroCollectionPolicy
 from muzero_eval_policy import MuZeroEvalPolicy
 from replay_buffer import ReplayBuffer
 from tic_tac_toe_env import TicTacToeEnv
-
+import tensorflow as tf
 
 TRAIN_ITERATIONS = 200
 
@@ -34,6 +34,7 @@ eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
 
 for train_iter in range(TRAIN_ITERATIONS):
     print('STARTING TRAINING ITERATION #{}'.format(train_iter))
+    tf.summary.experimental.set_step(train_iter)
     for play_iter in range(PLAY_ITERATIONS):
         print('STARTING PLAY ITERATION #{}'.format(play_iter))
         start_time = time.time()

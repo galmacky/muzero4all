@@ -64,16 +64,16 @@ class MuZeroCollectionPolicy(Policy):
             observation = self.env.get_current_game_input()  # Use game state before taking the action.
             states, is_final, reward = self.env.step(best_action)
             ######## BUG HERE!!!!!!!!!!! ISFINAL NEVER TRIGGERED
-            print('self play env step res (states, is_final, reward): ',
-             states, is_final, reward)
+            # print('self play env step res (states, is_final, reward): ',
+            #  states, is_final, reward)
             trajectory.feed(best_action, reward, p, v, observation)
             if is_final:
                 print("#######")
                 break
-        print('!!!!!!!!!!!!!!!!!!!!!!!\n')
-        print('TRAJECTORY ACTIONS: ', trajectory.action_history)
-        print('TRAJECTORY CHILD_VISITS: ', trajectory.child_visits)
-        print('TRAJECTORY REWARDS: ', trajectory.rewards)
+        # print('!!!!!!!!!!!!!!!!!!!!!!!\n')
+        # print('TRAJECTORY ACTIONS: ', trajectory.action_history)
+        # print('TRAJECTORY CHILD_VISITS: ', trajectory.child_visits)
+        # print('TRAJECTORY REWARDS: ', trajectory.rewards)
         self.feed_replay_buffer(trajectory)
 
     def feed_replay_buffer(self, trajectory):

@@ -27,6 +27,9 @@ class MuZeroEvalPolicy(Policy):
         self.lr = 3e-4
         self.weight_decay = 1e-4
 
+        self.train_log_dir = 'logs/gradient_tape/train'
+        self.train_summary_writer = tf.summary.create_file_writer(self.train_log_dir)
+
         # self.model = MuZeroMctsModel(env, self.network)
         # # env is used only for the action space.
         # self.core = MctsCore(env, self.model, discount=discount)
@@ -65,10 +68,14 @@ class MuZeroEvalPolicy(Policy):
             batch = self.replay_buffer.sample_batch(
                 num_unroll_steps, td_steps=2  #TODO: TUNE td_steps
                 )
-            print('BATCH: ', batch)
-            self.update_weights(batch)
+            
+            #This gets set in training and used as a global variable for updates for tensorboard.
+            current_step = tf.summary.experimental.get_step()*num_steps + i
+            # print("current_step", current_step)
+            # print('BATCH: ', batch)
+            self.update_weights(batch, current_step)
 
-    def update_weights(self, batch):
+    def update_weights(self, batch, current_step):
 
         loss = 0
         value_loss_contrib_sum = 0
@@ -96,27 +103,27 @@ class MuZeroEvalPolicy(Policy):
 
                 for prediction, target in zip(predictions, targets):
                     gradient_scale, value, reward, policy_logits = prediction
-                    print('\nPREDICTIONS:\n')
-                    print('gradient_scale: ', gradient_scale)
-                    print('value: ', value)
-                    print('reward: ', reward)
-                    print('policy_logits: ', policy_logits)
+                    # print('\nPREDICTIONS:\n')
+                    # print('gradient_scale: ', gradient_scale)
+                    # print('value: ', value)
+                    # print('reward: ', reward)
+                    # print('policy_logits: ', policy_logits)
                     target_value, target_reward, target_policy = target
-                    print('\nTARGETS:\n')
-                    print('target_value: ', target_value)
-                    print('target_reward: ', target_reward)
-                    print('target_policy: ', target_policy)
+                    # print('\nTARGETS:\n')
+                    # print('target_value: ', target_value)
+                    # print('target_reward: ', target_reward)
+                    # print('target_policy: ', target_policy)
 
                     # print ('prediction:', prediction)
                     # print ('target:', target)
                     # TODO: fix reward / target_reward to be float32.
                     value_loss_contrib = self.scalar_loss(value, target_value) 
-                    print('value_loss_contrib: ', value_loss_contrib)
+                    # print('value_loss_contrib: ', value_loss_contrib)
                     reward_loss_contrib = self.scalar_loss(reward, target_reward)
-                    print('reward_loss_contrib: ', reward_loss_contrib)
+                    # print('reward_loss_contrib: ', reward_loss_contrib)
                     policy_loss_contrib = tf.nn.softmax_cross_entropy_with_logits(
                                                 logits=policy_logits, labels=target_policy)
-                    print('policy_loss_contrib: ', policy_loss_contrib)
+                    # print('policy_loss_contrib: ', policy_loss_contrib)
                     value_loss_contrib_sum += value_loss_contrib
                     reward_loss_contrib_sum += reward_loss_contrib
                     policy_loss_contrib_sum += policy_loss_contrib
@@ -136,13 +143,22 @@ class MuZeroEvalPolicy(Policy):
         # print('NETWORK_WEIGHTS: ', self.network.get_weights())
         gradients = tape.gradient(loss, self.network.get_weights())
         self.optimizer.apply_gradients(zip(gradients, self.network.get_weights()))
-        print('value_loss_contrib_sum: ', value_loss_contrib_sum)
-        print('reward_loss_contrib_sum: ', reward_loss_contrib_sum)
-        print('policy_loss_contrib_sum: ', policy_loss_contrib_sum)
-        print('weight_reg_loss_contrib_sum: ', weight_reg_loss_contrib_sum)
+        # print('value_loss_contrib_sum: ', value_loss_contrib_sum)
+        # print('reward_loss_contrib_sum: ', reward_loss_contrib_sum)
+        # print('policy_loss_contrib_sum: ', policy_loss_contrib_sum)
+        # print('weight_reg_loss_contrib_sum: ', weight_reg_loss_contrib_sum)
 
+        # print('loss', loss)
 
-        print('loss', loss)
+        #TODO(FJUR): 5 is from batch size, we need to make this a config.
+        # print('current_step',  tf.summary.experimental.get_step())
+        # print('current_step',  current_step)
+        with self.train_summary_writer.as_default():
+            tf.summary.scalar('value_loss_contrib_sum',np.reshape(value_loss_contrib_sum, []), step=current_step)
+            tf.summary.scalar('reward_loss_contrib_sum',np.reshape(reward_loss_contrib_sum, []) , step=current_step)
+            tf.summary.scalar('policy_loss_contrib_sum',np.reshape(policy_loss_contrib_sum, []) , step=current_step)
+            tf.summary.scalar('weight_reg_loss_contrib_sum',np.reshape(weight_reg_loss_contrib_sum, []), step=current_step )
+            tf.summary.scalar('loss', np.reshape(loss, []) , step=current_step)
 
     def scalar_loss(self, y_true, y_pred):
         return tf.square(y_true - y_pred)
