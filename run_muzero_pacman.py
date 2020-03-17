@@ -22,7 +22,7 @@ NUM_TRAIN_STEPS = 20
 NUM_UNROLL_STEPS = 5
 
 initializer = PacManInitializer()
-env = PacmanDetEnv()
+env = PacmanDetEnv(screen_images=True)
 env.reset()
 
 #env = PacmanDetEnv()
