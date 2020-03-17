@@ -1,6 +1,7 @@
 
 import time
 import unittest
+import tensorflow as tf
 
 from basic_mcts_model import BasicMctsModel
 from mcts_policy import MctsPolicy
@@ -33,6 +34,7 @@ eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
 
 for train_iter in range(TRAIN_ITERATIONS):
     print('STARTING TRAINING ITERATION #{}'.format(train_iter))
+    tf.summary.experimental.set_step(train_iter)
     for play_iter in range(PLAY_ITERATIONS):
         print('STARTING PLAY ITERATION #{}'.format(play_iter))
         start_time = time.time()
