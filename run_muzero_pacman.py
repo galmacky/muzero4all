@@ -16,7 +16,7 @@ from tic_tac_toe_env import TicTacToeEnv
 
 TRAIN_ITERATIONS = 200
 
-PLAY_ITERATIONS = 20
+PLAY_ITERATIONS = 1
 
 NUM_TRAIN_STEPS = 20
 NUM_UNROLL_STEPS = 5
@@ -36,7 +36,7 @@ for train_iter in range(TRAIN_ITERATIONS):
     for play_iter in range(PLAY_ITERATIONS):
         print('STARTING PLAY ITERATION #{}'.format(play_iter))
         start_time = time.time()
-        col_policy.run_self_play()
+        col_policy.run_self_play(render=True)
         end_time = time.time()
         print('Self Play Iteration Runtime: {}'.format(end_time - start_time))
     eval_policy.train(NUM_TRAIN_STEPS, NUM_UNROLL_STEPS)

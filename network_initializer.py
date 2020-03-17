@@ -185,7 +185,6 @@ class PacManInitializer(NetworkInitializer):
         
         def call(self, inputs):
             hidden_state = self.representation_network(inputs)
-            print (inputs.shape, hidden_state.shape)
             return hidden_state
 
     class DynamicsEncoder(object):

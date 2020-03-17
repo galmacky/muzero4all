@@ -103,3 +103,6 @@ class PacmanDetEnv(MctsEnv):
 
     def get_current_game_input(self):
         return self.env.render('rgb_array')
+
+    def render(self):
+        self.env.render()
