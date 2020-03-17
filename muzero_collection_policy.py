@@ -63,7 +63,6 @@ class MuZeroCollectionPolicy(Policy):
             best_action = self.choose_action(p)
             observation = self.env.get_current_game_input()  # Use game state before taking the action.
             states, is_final, reward = self.env.step(best_action)
-            self.env.env.render()
             ######## BUG HERE!!!!!!!!!!! ISFINAL NEVER TRIGGERED
             print('self play env step res (states, is_final, reward): ',
              states, is_final, reward)
