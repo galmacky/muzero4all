@@ -125,6 +125,7 @@ class MuZeroEvalPolicy(Policy):
                         value_loss_contrib +
                         reward_loss_contrib +
                         policy_loss_contrib)
+                    print('l_value_contrib: ', l)
 
                     total_loss_contrib = self.scale_gradient(l, gradient_scale)
                     print('total_loss_contrib: ', total_loss_contrib)
