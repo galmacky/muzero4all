@@ -178,11 +178,14 @@ class PacManInitializer(NetworkInitializer):
         def __init__(self):
             super(PacManInitializer().RepresentationNetwork, self).__init__()
             self.representation_network = models.Sequential()
+            self.representation_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
+            self.representation_network.add(layers.Flatten())
             self.representation_network.add(layers.Dense(PacManConfig.representation_size, activation='relu'))
             self.representation_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
         
         def call(self, inputs):
             hidden_state = self.representation_network(inputs)
+            print (inputs.shape, hidden_state.shape)
             return hidden_state
 
     class DynamicsEncoder(object):

@@ -49,8 +49,28 @@ class Trajectory(object):
             # know this reward.
             # NOTE: deviation from muzero's pseudocode: we changed this code to
             # return current index's reward.
-            if current_index > 0 and current_index < len(self.rewards):
-                last_reward = self.rewards[current_index]
+            if current_index > 0 and current_index <= len(self.rewards):
+                last_reward = self.rewards[current_index - 1] # FIX case where
+                """
+                PREDICTIONS:
+
+gradient_scale:  1.0
+value:  tf.Tensor([[-1.0044323]], shape=(1, 1), dtype=float32)
+reward:  0
+policy_logits:  tf.Tensor(
+[[0.4355181  0.16353947 0.         0.         0.25271562 0.
+  0.         0.         0.        ]], shape=(1, 9), dtype=float32)
+
+TARGETS:
+
+target_value:  -1.0
+target_reward:  -1.0
+target_policy:  tf.Tensor([0.18 0.11 0.14 0.08 0.13 0.08 0.09 0.11 0.08], shape=(9,), dtype=float64)
+value_loss_contrib:  tf.Tensor([[1.9645466e-05]], shape=(1, 1), dtype=float32)
+reward_loss_contrib:  tf.Tensor(1.0, shape=(), dtype=float32)
+policy_loss_contrib:  tf.Tensor([2.1744442], shape=(1,), dtype=float32)
+total_loss_contrib:  tf.Tensor([[3.1744637]], shape=(1, 1), dtype=float32)
+                """
             else:
                 last_reward = 0.
 

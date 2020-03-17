@@ -6,7 +6,7 @@ from basic_mcts_model import BasicMctsModel
 from mcts_policy import MctsPolicy
 from pacman_det_env import PacmanDetEnv
 from gym.envs.atari import atari_env
-from network_initializer import TicTacToeInitializer, AtariInitializer
+from network_initializer import TicTacToeInitializer, AtariInitializer, PacManInitializer
 from network import Network
 from muzero_collection_policy import MuZeroCollectionPolicy
 from muzero_eval_policy import MuZeroEvalPolicy
@@ -21,8 +21,9 @@ PLAY_ITERATIONS = 20
 NUM_TRAIN_STEPS = 20
 NUM_UNROLL_STEPS = 5
 
-initializer = AtariInitializer()
-env = PacmanDetEnv()
+initializer = PacManInitializer()
+env = PacmanDetEnv(screen_images=True)
+env.reset()
 
 #env = PacmanDetEnv()
 network = Network(initializer)
@@ -44,9 +45,7 @@ for train_iter in range(TRAIN_ITERATIONS):
 
 idx = 0
 total_reward = 0
-#Reset the env for a game
-env = TicTacToeEnv()
-env.render()
+env.reset()
 while True:
     start_time = time.time()
     print('Starting action calculation')

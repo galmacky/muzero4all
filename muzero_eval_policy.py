@@ -132,8 +132,11 @@ class MuZeroEvalPolicy(Policy):
                         value_loss_contrib +
                         reward_loss_contrib +
                         policy_loss_contrib)
+                    print('l_value_contrib: ', l)
 
-                    loss += self.scale_gradient(l, gradient_scale)
+                    total_loss_contrib = self.scale_gradient(l, gradient_scale)
+                    print('total_loss_contrib: ', total_loss_contrib)
+                    loss += total_loss_contrib
             for weights in self.network.get_weights():
                 weight_reg_loss_contrib =  self.weight_decay * tf.nn.l2_loss(weights)
                 weight_reg_loss_contrib_sum += weight_reg_loss_contrib
