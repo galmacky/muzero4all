@@ -49,9 +49,9 @@ class FrozenLakeDetEnv(MctsEnv):
     def get_states(self):
         return self._states
 
-    def get_real_states(self):
+    def get_current_game_input(self):
         """Returns env's real states not the action history."""
-        return self.remove_ansi(self.env.render(mode='ansi'))
+        return self.remove_ansi(self.env.render(mode='ansi').getvalue())
 
     def remove_ansi(self, ansi_str):
         ansi_escape_8bit = re.compile(
