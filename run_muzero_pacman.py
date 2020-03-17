@@ -29,7 +29,8 @@ env.reset()
 #env = PacmanDetEnv()
 network = Network(initializer)
 replay_buffer = ReplayBuffer()
-col_policy = MuZeroCollectionPolicy(env, network, replay_buffer)
+col_policy = MuZeroCollectionPolicy(env, network, replay_buffer,
+                                    num_simulations=10, max_moves=100, discount=0.999)
 eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
 
 for train_iter in range(TRAIN_ITERATIONS):
