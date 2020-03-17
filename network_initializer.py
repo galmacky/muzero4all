@@ -127,7 +127,7 @@ class PacManInitializer(NetworkInitializer):
         returns : policy_logits, value 
         '''
         def __init__(self):
-            super(PacManInitializer().PredictionNetwork, self).__init__()
+            super(PacManInitializer.PredictionNetwork, self).__init__()
             #Define model here
             self.policy_network = models.Sequential()
             self.policy_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
@@ -221,7 +221,7 @@ class FrozenLake(NetworkInitializer):
         prediction_network = models.Sequential()
         prediction_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
         prediction_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
-        prediction_network.add(layers.Dense(output_size)) #TODO(FJUR): put correct output size
+        prediction_network.add(layers.Dense(output_size=2))
 
         dynamics_network = models.Sequential()
         dynamics_network.add(layers.Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))
@@ -243,14 +243,41 @@ class FrozenLake(NetworkInitializer):
 '''
 class AtariInitializer(NetworkInitializer):
 
+    class PredictionNetwork(tf.keras.Model):
+        '''
+        Creates a network that returns the policy logits and the value
+        returns : policy_logits, value
+        '''
+
+        def __init__(self):
+            super(AtariInitializer.PredictionNetwork, self).__init__()
+            self.prediction_network = models.Sequential()
+            self.prediction_network.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu'))
+            self.prediction_network.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu'))
+            self.prediction_network.add(layers.Dense(50, activation='relu'))
+            self.prediction_network.add(layers.Dense(PacManConfig.action_size + 1))
+
+        def call(self, inputs):
+            result = self.prediction_network(inputs)
+            value = result[0]
+            policy_logits = result[1:]
+            return (policy_logits, value)
+
+    class DynamicsEncoder(object):
+        def encode(self, hidden_state, action):
+            encoded_actions = tf.one_hot(action.index, PacManConfig.action_size)
+            encoded_actions = tf.expand_dims(encoded_actions, 0)
+            encoded_hidden_state= tf.concat([hidden_state, encoded_actions], axis=0)
+            encoded_hidden_state = np.expand_dims(encoded_hidden_state, 0)
+            #Tic Tac Toe uses dense layer so flatten.
+            encoded_hidden_state = tf.expand_dims(tf.reshape(encoded_hidden_state, [-1]), 0)
+            return encoded_hidden_state
+
     def initialize(self):
         # : one or two convolutional layers
         # that preserve the resolution but reduce the number of planes, followed by a fully connected layer to the size of the
         # output.
-        prediction_network = models.Sequential()
-        prediction_network.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu'))
-        prediction_network.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu'))
-        prediction_network.add(layers.Dense(output_size))
+        prediction_network = AtariInitializer.PredictionNetwork()
 
         dynamics_network = models.Sequential()
         # 1 convolution with stride 2 and 128 output planes, output resolution 48x48.
@@ -305,4 +332,4 @@ class AtariInitializer(NetworkInitializer):
         The kernel size is 3x3 for all operations.
         '''
 
-        return (prediction_network, dynamics_network, representation_network)
+        return (prediction_network, dynamics_network, representation_network, AtariInitializer.DynamicsEncoder(), None)
