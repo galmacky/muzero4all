@@ -71,7 +71,6 @@ class MuZeroEvalPolicy(Policy):
             
             #This gets set in training and used as a global variable for updates for tensorboard.
             current_step = tf.summary.experimental.get_step()*num_steps + i
-            # print("current_step", current_step)
             # print('BATCH: ', batch)
             self.update_weights(batch, current_step)
 
@@ -153,9 +152,6 @@ class MuZeroEvalPolicy(Policy):
 
         # print('loss', loss)
 
-        #TODO(FJUR): 5 is from batch size, we need to make this a config.
-        # print('current_step',  tf.summary.experimental.get_step())
-        # print('current_step',  current_step)
         with self.train_summary_writer.as_default():
             tf.summary.scalar('value_loss_contrib_sum',np.reshape(value_loss_contrib_sum, []), step=current_step)
             tf.summary.scalar('reward_loss_contrib_sum',np.reshape(reward_loss_contrib_sum, []) , step=current_step)
