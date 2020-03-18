@@ -30,7 +30,7 @@ env.reset()
 network = Network(initializer)
 replay_buffer = ReplayBuffer()
 col_policy = MuZeroCollectionPolicy(env, network, replay_buffer,
-                                    num_simulations=50, max_moves=2000, discount=0.999)
+                                    num_simulations=100, max_moves=2000, discount=0.999)
 eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
 
 eval_log_dir = 'logs/gradient_tape/eval'
@@ -66,6 +66,9 @@ for train_iter in range(TRAIN_ITERATIONS):
             print("Hit is_final!")
             break
         idx += 1
+    last_trajectory = replay_buffer.buffer[-1]
+    total_reward_2 = sum(last_trajectory.rewards)
     with eval_summary_writer.as_default():
         tf.summary.scalar('total_reward', total_reward, step=train_iter)
+        tf.summary.scalar('training_total_reward', total_reward_2, step=train_iter)
 
