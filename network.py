@@ -1,7 +1,4 @@
-import os
 import typing
-
-from tensorflow.keras import models
 
 from network_initializer import NetworkInitializer
 import numpy as np
@@ -40,17 +37,6 @@ class Network(object):
         self.prediction_network, self.dynamics_network, self.representation_network, self.dynamics_encoder, self.represetnation_encoder = initializer.initialize()
         self.training_steps = 0
 
-    def save_models(self, dir):
-        models.save_model(self.prediction_network, os.path.join(dir, 'prediction'))
-        models.save_model(self.dynamics_network, os.path.join(dir, 'dynamics'))
-        models.save_model(self.representation_network, os.path.join(dir, 'representation'))
-
-    def load_models(self, dir):
-        models.load_model(self.prediction_network, os.path.join(dir, 'prediction'))
-        models.load_model(self.dynamics_network, os.path.join(dir, 'dynamics'))
-        models.load_model(self.representation_network, os.path.join(dir, 'representation'))
-
-
     def get_all_trainable_weights(self):
         return (self.prediction_network.trainable_weights + 
         self.dynamics_network.trainable_weights + 
@@ -58,9 +44,8 @@ class Network(object):
 
     def initial_inference(self, image) -> NetworkOutput:
         # representation + prediction function
-        hidden_state = self.representation_network.predict(image)
-        policy_logits, value = self.prediction_network.predict(hidden_state)
-        print ('hidden:', hidden_state.shape)
+        hidden_state = self.representation_network(image)
+        policy_logits, value = self.prediction_network(hidden_state)
         return NetworkOutput(value, 0, policy_logits, hidden_state)
 
     def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
@@ -68,9 +53,8 @@ class Network(object):
         #Need to encode action information with hidden state before passing
         #to the dynamics function.
         encoded_state = self.dynamics_encoder.encode(hidden_state, action)
-        print ('encoded:', encoded_state.shape)
-        hidden_state, reward = self.dynamics_network.predict(encoded_state)
-        policy_logits, value = self.prediction_network.predict(hidden_state)
+        hidden_state, reward = self.dynamics_network(encoded_state)
+        policy_logits, value = self.prediction_network(hidden_state)
         #Enable this when value/reward are discrete support sets.
         # value = _decode_support_set(value)
         return NetworkOutput(value, reward, policy_logits, hidden_state)

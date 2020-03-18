@@ -130,11 +130,11 @@ class PacManInitializer(NetworkInitializer):
             super(PacManInitializer.PredictionNetwork, self).__init__()
             #Define model here
             self.policy_network = models.Sequential()
-            self.policy_network.add(layers.Dense(input_shape=(36,), units=PacManConfig.hidden_size, activation='relu'))
+            self.policy_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
             self.policy_network.add(layers.Dense(PacManConfig.action_size, activation='relu'))
             
             self.value_network = models.Sequential()
-            self.value_network.add(layers.Dense(input_shape=(36,), units=PacManConfig.hidden_size, activation='relu'))
+            self.value_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
             # self.value_network.add(layers.Dense(PacManConfig.support_size *2 + 1, activation='relu'))
             self.value_network.add(layers.Dense(PacManConfig.value_size, activation='relu'))
 
@@ -152,13 +152,13 @@ class PacManInitializer(NetworkInitializer):
         Actions are encoded spatially in planes of the same resolution as the hidden state. In Atari, this resolution is 6x6 (see description of downsampling in Network Architecture section), in board games this is the same as the board size (19x19 for Go, 8x8 for chess, 9x9 for shogi). 1
         '''
         def __init__(self):
-            super(PacManInitializer.DynamicsNetwork, self).__init__()
+            super(PacManInitializer().DynamicsNetwork, self).__init__()
             self.dynamic_network = models.Sequential()
-            self.dynamic_network.add(layers.Dense(input_shape=(72,), units=PacManConfig.representation_size, activation='relu'))
+            self.dynamic_network.add(layers.Dense(PacManConfig.representation_size, activation='relu'))
             self.dynamic_network.add(layers.Dense(PacManConfig.hidden_size, activation='relu'))
             
             self.reward_network = models.Sequential()
-            self.reward_network.add(layers.Dense(input_shape=(72,), units=PacManConfig.representation_size, activation='relu'))
+            self.reward_network.add(layers.Dense(PacManConfig.representation_size, activation='relu'))
             self.reward_network.add(layers.Dense(PacManConfig.reward_size, activation='relu'))
         
         '''
