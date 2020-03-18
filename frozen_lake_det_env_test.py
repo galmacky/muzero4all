@@ -17,7 +17,7 @@ class FrozenLakeDetEnvTest(unittest.TestCase):
         self.env.env.close()
 
     def test_init(self):
-        self.assertEqual('\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
 
     def test_reset_get_states(self):
         actions = [RIGHT, RIGHT]
@@ -26,13 +26,13 @@ class FrozenLakeDetEnvTest(unittest.TestCase):
         self.assertEqual([RIGHT, RIGHT], self.env.get_states())
         self.assertEqual([RIGHT, RIGHT], new_states)
         self.assertEqual([], self.env.reset())
-        self.assertEqual('\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
         self.assertEqual([], self.env.get_states())
 
     def test_set_states(self):
         self.env.set_states([RIGHT, RIGHT])
         self.assertEqual([RIGHT, RIGHT], self.env.get_states())
-        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
         self.env.set_states([RIGHT, RIGHT, DOWN, DOWN, DOWN])
 
         new_states, is_final, reward = self.env.step(RIGHT)
@@ -40,7 +40,7 @@ class FrozenLakeDetEnvTest(unittest.TestCase):
         self.assertTrue(is_final)
         self.assertEqual(1.0, reward)
         self.assertEqual([RIGHT, RIGHT, DOWN, DOWN, DOWN, RIGHT], new_states)
-        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
         # self.env.env.render()
 
     def test_win(self):
@@ -50,14 +50,14 @@ class FrozenLakeDetEnvTest(unittest.TestCase):
         self.assertFalse(is_final)
         self.assertEqual(0.0, reward)
         self.assertEqual(actions, new_states)
-        self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
 
         new_states, is_final, reward = self.env.step(RIGHT)
 
         self.assertTrue(is_final)
         self.assertEqual(1.0, reward)
         self.assertEqual(actions + [RIGHT], new_states)
-        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('  (Right)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
         # self.env.env.render()
 
     def test_hole(self):
@@ -67,7 +67,7 @@ class FrozenLakeDetEnvTest(unittest.TestCase):
         self.assertTrue(is_final)
         self.assertEqual(0.0, reward)  # NOTE: reward is not negative
         self.assertEqual(actions, new_states)
-        self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_current_game_input())
+        self.assertEqual('  (Down)\nSFFF\nFHFH\nFFFH\nHFFG\n', self.env.get_real_states())
         # self.env.env.render()
 
 
