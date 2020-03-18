@@ -30,8 +30,12 @@ env.reset()
 network = Network(initializer)
 replay_buffer = ReplayBuffer()
 col_policy = MuZeroCollectionPolicy(env, network, replay_buffer,
-                                    num_simulations=50, max_moves=2000, discount=0.999)
+                                    num_simulations=10, max_moves=20, discount=0.999)
 eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
+
+model_dir = 'logs/models'
+# Uncomment this to load models
+# network.load_models(model_dir)
 
 eval_log_dir = 'logs/gradient_tape/train'  # Use the same log dir as train for convenience
 eval_summary_writer = tf.summary.create_file_writer(eval_log_dir)
@@ -46,7 +50,8 @@ for train_iter in range(TRAIN_ITERATIONS):
         end_time = time.time()
         print('Self Play Iteration Runtime: {}'.format(end_time - start_time))
     eval_policy.train(NUM_TRAIN_STEPS, NUM_UNROLL_STEPS)
-    # TODO: pacman, save weights, tensorboard
+
+    network.save_models(model_dir)
 
     total_reward = 0
     env.reset()

@@ -19,11 +19,11 @@ class Trajectory(object):
         # Each of these are the same size, per each state we've visited in the
         # trajectory.
         if not (isinstance(action, int) or isinstance(action, float)):
-            action = action.numpy()
+            action = action
         if not (isinstance(child_visit_dist, dict)):
-            child_visit_dist = child_visit_dist.numpy()
+            child_visit_dist = child_visit_dist
         if not (isinstance(root_value, int) or isinstance(root_value, float)):
-            root_value = root_value.numpy()
+            root_value = root_value
         self.action_history.append(action)
         self.rewards.append(reward)
         self.child_visits.append(child_visit_dist)
