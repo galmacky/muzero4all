@@ -33,7 +33,7 @@ col_policy = MuZeroCollectionPolicy(env, network, replay_buffer,
                                     num_simulations=50, max_moves=2000, discount=0.999)
 eval_policy = MuZeroEvalPolicy(env, network, replay_buffer)
 
-eval_log_dir = 'logs/gradient_tape/train'  # Use the same log dir as train for convenience
+eval_log_dir = 'logs/gradient_tape/eval'
 eval_summary_writer = tf.summary.create_file_writer(eval_log_dir)
 
 for train_iter in range(TRAIN_ITERATIONS):
