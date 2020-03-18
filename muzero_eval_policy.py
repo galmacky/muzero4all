@@ -170,7 +170,8 @@ class MuZeroEvalPolicy(Policy):
 
     def get_policy_logits(self):
         current_state = self.env.get_current_game_input()
-        current_state = np.expand_dims(current_state, 0)
+        current_state = tf.expand_dims(current_state, 0)
+        current_state = tf.cast(current_state, dtype=tf.float32)
         # policy_logits, value = self.network.prediction_network(
         #     self.network.initial_inference(current_state))
         network_output = self.network.initial_inference(current_state)
@@ -179,4 +180,4 @@ class MuZeroEvalPolicy(Policy):
 
     def action(self):
         #arg max along logits dimension, not batch dimension, reshape to scalar tensor.
-        return tf.reshape(tf.math.argmax(self.get_policy_logits(),axis=1), [])
+        return tf.reshape(tf.math.argmax(self.get_policy_logits(), axis=1), [])
