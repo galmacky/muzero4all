@@ -46,6 +46,7 @@ class Network(object):
         # representation + prediction function
         hidden_state = self.representation_network(image)
         policy_logits, value = self.prediction_network(hidden_state)
+        
         return NetworkOutput(value, 0, policy_logits, hidden_state)
 
     def recurrent_inference(self, hidden_state, action) -> NetworkOutput:
@@ -61,18 +62,7 @@ class Network(object):
 
     def get_weights(self):
         # Returns the weights of this network.
-        # return np.concatenate(self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights())
-        # return np.concatenate([self.representation_network.get_weights(), self.dynamics_network.get_weights(), self.prediction_network.get_weights()]).ravel()
         return self.get_all_trainable_weights()
-        # weights = []
-        # for weight in self.representation_network.get_weights():
-        #     weights.append(weights)
-        # for weight in self.dynamics_network.get_weights():
-        #     weights.append(weights)
-        # for weight in self.prediction_network.get_weights():
-        #     weights.append(weights)
-
-        # return weights
     
     def training_steps(self) -> int:
         # How many steps / batches the network has been trained for.
